@@ -4,16 +4,13 @@ import { Toaster } from "sonner";
 import { Sidebar } from "@/components/layout/Sidebar";
 import Dashboard from "@/pages/Dashboard";
 import Admin from "@/pages/Admin";
+import Leaderboard from "@/pages/Leaderboard";
 import NotFound from "@/pages/not-found";
 
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  /* Close drawer on route change */
-  useEffect(() => { setMobileOpen(false); }, []);
-
-  /* Lock body scroll when mobile drawer is open */
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -33,7 +30,7 @@ function Layout() {
         />
       )}
 
-      {/* Sidebar — hidden on mobile unless mobileOpen, always visible on md+ */}
+      {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 md:relative md:z-auto md:flex transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <Sidebar
           collapsed={collapsed}
@@ -46,6 +43,7 @@ function Layout() {
       <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         <Switch>
           <Route path="/" component={() => <Dashboard onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/leaderboard" component={() => <Leaderboard onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>

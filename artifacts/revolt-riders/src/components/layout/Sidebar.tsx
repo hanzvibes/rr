@@ -1,10 +1,11 @@
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, X } from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, Trophy, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/" },
+  { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
   { label: "Admin Panel", icon: Shield, href: "/admin" },
 ];
 
@@ -21,7 +22,7 @@ export function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
     <motion.aside
       animate={{ width: collapsed ? 72 : 260 }}
       transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-      className="flex flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] h-full"
+      className="flex flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]"
       style={{ minHeight: "100dvh" }}
     >
       {/* Logo row */}
