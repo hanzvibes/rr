@@ -106,7 +106,7 @@ function KmBar({ value, max, rank }: { value: number; max: number; rank: number 
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
-        transition={{ duration: 0.9, delay: 0.3, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.45, delay: 0.05, ease: [0.4, 0, 0.2, 1] }}
         className="h-full rounded-full"
         style={{ background: color }}
       />
@@ -129,9 +129,9 @@ function PodiumBlock({ rider, position }: { rider: RankedRider; position: 1 | 2 
     <div className="flex flex-col items-center gap-3">
       {/* Avatar + name above podium */}
       <motion.div
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: position * 0.1 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, delay: position * 0.06 }}
         className="flex flex-col items-center gap-1.5 text-center"
       >
         <div className={cn(
@@ -152,7 +152,7 @@ function PodiumBlock({ rider, position }: { rider: RankedRider; position: 1 | 2 
       <motion.div
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
-        transition={{ duration: 0.5, delay: 0.4 + position * 0.08, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.25, delay: 0.1 + position * 0.05, ease: [0.4, 0, 0.2, 1] }}
         style={{ originY: 1 }}
         className={cn(
           "relative flex w-20 md:w-28 items-start justify-center rounded-t-2xl border pt-2",
@@ -265,9 +265,9 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
 
         {/* Podium */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2 }}
           className="glass-card mb-5 px-4 py-6 md:px-8 md:py-8"
         >
           <div className="mb-6 flex items-center gap-2">
@@ -300,9 +300,9 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
 
         {/* Full rankings list */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.15 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.1 }}
           className="glass-card overflow-hidden"
         >
           <div className="border-b border-[rgba(39,39,42,0.6)] px-5 py-3.5 flex items-center justify-between">
@@ -362,7 +362,7 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.2 }}
             className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3"
           >
             {[
@@ -400,9 +400,9 @@ function RiderRow({ rider, index, maxKm, isTop3 = false }: {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.4) }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15, delay: Math.min(index * 0.025, 0.25) }}
       className={cn(
         "flex items-center gap-3 md:gap-4 px-4 md:px-5 py-3.5 border-b border-[rgba(39,39,42,0.4)] last:border-0 transition-colors hover:bg-[rgba(255,255,255,0.02)]",
         isTop3 && rider.rank === 1 && "bg-[rgba(245,158,11,0.04)]",

@@ -59,7 +59,7 @@ function ParticipationBar({ value, max }: { value: number; max: number }) {
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
-        transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
         className="h-full rounded-full bg-gradient-to-r from-[#7C3AED] to-[#A855F7]"
       />
     </div>
@@ -97,9 +97,9 @@ function RunCard({
 
       {/* Card */}
       <motion.div
-        initial={{ opacity: 0, x: -10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.3, delay: Math.min(index * 0.04, 0.5) }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.15, delay: Math.min(index * 0.025, 0.3) }}
         className="glass-card flex-1 mb-3 overflow-hidden"
       >
         {/* Header */}
@@ -160,7 +160,7 @@ function RunCard({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.18 }}
               className="overflow-hidden border-t border-[rgba(39,39,42,0.6)]"
             >
               <div className="px-4 md:px-5 py-3">
@@ -320,8 +320,9 @@ export default function RunHistory({ onMenuOpen }: { onMenuOpen?: () => void }) 
         {/* Stats summary */}
         {!loading && stats && (
           <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.18 }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"
           >
             {[
@@ -344,9 +345,9 @@ export default function RunHistory({ onMenuOpen }: { onMenuOpen?: () => void }) 
 
         {/* Toolbar */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.18, delay: 0.08 }}
           className="glass-card px-4 py-3 mb-4 flex flex-col sm:flex-row gap-3"
         >
           <div className="relative flex-1">

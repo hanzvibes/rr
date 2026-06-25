@@ -83,9 +83,9 @@ interface StatCardProps {
 function StatCard({ label, value, suffix = "", sub, icon: Icon, accent, sparkline, delay = 0 }: StatCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay, ease: [0.4, 0, 0.2, 1] }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18, delay }}
       className="glass-card p-4 md:p-5 flex flex-col gap-3"
     >
       <div className="flex items-start justify-between">
@@ -126,9 +126,10 @@ function RiderCard({ rider, onClick }: { rider: Rider; onClick: () => void }) {
   const runs = parseRuns(rider.aktivitas);
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-4 cursor-pointer active:scale-[0.99] transition-transform"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.15 }}
+      className="glass-card p-4 cursor-pointer"
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-2 mb-3">
@@ -208,7 +209,7 @@ function FilterDrawer({
             className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm" onClick={onClose} />
           <motion.div
             initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            transition={{ type: "tween", duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
             className="fixed bottom-0 left-0 right-0 z-50 rounded-t-2xl border-t border-[rgba(39,39,42,0.8)] bg-[#111111] p-5 space-y-5"
           >
             <div className="flex items-center justify-between">
@@ -280,7 +281,7 @@ function RiderModal({ rider, onClose }: { rider: Rider; onClose: () => void }) {
           initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: "100%", opacity: 0 }}
-          transition={{ type: "spring", damping: 30, stiffness: 400 }}
+          transition={{ type: "tween", duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
           className="relative w-full sm:max-w-md overflow-hidden rounded-t-2xl sm:rounded-2xl border border-[rgba(39,39,42,0.8)] bg-[#111111] shadow-2xl shadow-black/60 max-h-[92dvh] overflow-y-auto"
           onClick={(e) => e.stopPropagation()}
         >
@@ -531,8 +532,8 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
         {/* Charts — stack on mobile */}
         <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.3 }} className="glass-card p-4 md:p-6 lg:col-span-2">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: 0.12 }} className="glass-card p-4 md:p-6 lg:col-span-2">
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <h3 className="text-[0.82rem] md:text-[0.88rem] font-semibold text-white">Top 15 Riders by Distance</h3>
@@ -555,14 +556,15 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
                   <YAxis tick={{ fontSize: 9, fill: "#71717A", fontFamily: "Inter" }} tickLine={false} axisLine={false} />
                   <Tooltip content={<ChartTooltip />} cursor={{ stroke: "rgba(139,92,246,0.2)", strokeWidth: 1 }} />
                   <Area type="monotone" dataKey="km" stroke="#8B5CF6" strokeWidth={2} fill="url(#areaGrad)"
-                    dot={{ r: 2.5, fill: "#8B5CF6", strokeWidth: 0 }} activeDot={{ r: 4.5, fill: "#A855F7", strokeWidth: 0 }} />
+                    dot={{ r: 2.5, fill: "#8B5CF6", strokeWidth: 0 }} activeDot={{ r: 4.5, fill: "#A855F7", strokeWidth: 0 }}
+                    isAnimationActive={false} />
                 </AreaChart>
               </ResponsiveContainer>
             )}
           </motion.div>
 
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.35 }} className="glass-card p-4 md:p-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            transition={{ duration: 0.2, delay: 0.16 }} className="glass-card p-4 md:p-6">
             <div className="mb-3">
               <h3 className="text-[0.82rem] md:text-[0.88rem] font-semibold text-white">Rank Distribution</h3>
               <p className="mt-0.5 text-[0.66rem] text-[#71717A]">Members by jabatan</p>
@@ -580,7 +582,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
                         <p className="text-sm font-semibold text-white">{payload[0].value} riders</p>
                       </div>
                     ) : null} cursor={{ fill: "rgba(139,92,246,0.06)" }} />
-                  <Bar dataKey="count" radius={[5, 5, 0, 0]}>
+                  <Bar dataKey="count" radius={[5, 5, 0, 0]} isAnimationActive={false}>
                     {barData.map((_, i) => <Cell key={i} fill={i % 2 === 0 ? "#8B5CF6" : "#A855F7"} opacity={0.85 - i * 0.05} />)}
                   </Bar>
                 </BarChart>
@@ -590,8 +592,8 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
         </div>
 
         {/* Member List */}
-        <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.4 }} className="glass-card overflow-hidden">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+          transition={{ duration: 0.2, delay: 0.2 }} className="glass-card overflow-hidden">
           {/* Toolbar */}
           <div className="border-b border-[rgba(39,39,42,0.6)] px-4 py-3">
             <div className="flex items-center gap-2">
@@ -702,7 +704,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
                     ) : (
                       filtered.map((rider, i) => (
                         <motion.tr key={rider.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                          transition={{ delay: Math.min(i * 0.012, 0.25) }}
+                          transition={{ delay: Math.min(i * 0.008, 0.15) }}
                           className="trow" onClick={() => setSelectedRider(rider)}>
                           <td className="px-3 py-3 text-[0.72rem] font-medium text-[#52525B]">{rider.no}</td>
                           <td className="px-3 py-3 text-[0.8rem] font-medium text-white">{rider.nama}</td>
