@@ -1,9 +1,6 @@
-import { useState } from "react";
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LayoutDashboard, Settings, ChevronLeft, ChevronRight, Shield,
-} from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -14,37 +11,49 @@ const NAV_ITEMS = [
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  onClose?: () => void;
 }
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
   const [location] = useLocation();
 
   return (
     <motion.aside
       animate={{ width: collapsed ? 72 : 260 }}
       transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-      className="relative flex flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]"
-      style={{ height: "100vh", position: "sticky", top: 0 }}
+      className="flex flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] h-full"
+      style={{ minHeight: "100dvh" }}
     >
-      {/* Logo */}
-      <div className="flex h-16 items-center border-b border-[rgba(39,39,42,0.6)] px-4">
-        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] shadow-lg shadow-purple-900/30">
-          <span className="text-sm font-bold text-white">R</span>
+      {/* Logo row */}
+      <div className="flex h-16 items-center justify-between border-b border-[rgba(39,39,42,0.6)] px-4">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] shadow-lg shadow-purple-900/30">
+            <span className="text-sm font-bold text-white">R</span>
+          </div>
+          <AnimatePresence>
+            {!collapsed && (
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.15 }}
+                className="min-w-0"
+              >
+                <p className="truncate text-[0.78rem] font-semibold text-white tracking-tight">REVOLT RIDERS</p>
+                <p className="truncate text-[0.62rem] text-[#71717A]">Mandatory Ride</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        <AnimatePresence>
-          {!collapsed && (
-            <motion.div
-              initial={{ opacity: 0, x: -8 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.15 }}
-              className="ml-3 min-w-0"
-            >
-              <p className="truncate text-[0.78rem] font-semibold text-white tracking-tight">REVOLT RIDERS</p>
-              <p className="truncate text-[0.62rem] text-[#71717A]">Mandatory Ride</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Mobile close button */}
+        {onClose && !collapsed && (
+          <button
+            onClick={onClose}
+            className="md:hidden flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:text-white transition-colors"
+          >
+            <X size={18} />
+          </button>
+        )}
       </div>
 
       {/* Nav */}
@@ -52,7 +61,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {NAV_ITEMS.map(({ label, icon: Icon, href }) => {
           const isActive = location === href;
           return (
-            <Link key={href} href={href}>
+            <Link key={href} href={href} onClick={onClose}>
               <div
                 className={cn(
                   "sidebar-item",
@@ -87,8 +96,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         })}
       </nav>
 
-      {/* Collapse button */}
-      <div className="border-t border-[rgba(39,39,42,0.6)] p-3">
+      {/* Collapse button — desktop only */}
+      <div className="hidden md:block border-t border-[rgba(39,39,42,0.6)] p-3">
         <button
           onClick={onToggle}
           className={cn(

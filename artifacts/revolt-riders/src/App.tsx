@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { Toaster } from "sonner";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -8,25 +8,45 @@ import NotFound from "@/pages/not-found";
 
 function Layout() {
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  /* Close drawer on route change */
+  useEffect(() => { setMobileOpen(false); }, []);
+
+  /* Lock body scroll when mobile drawer is open */
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0A]">
-      {/* Ambient glow decorations */}
-      <div
-        className="ambient-glow"
-        style={{ width: 600, height: 600, background: "#7C3AED", top: -200, left: -200 }}
-      />
-      <div
-        className="ambient-glow"
-        style={{ width: 400, height: 400, background: "#A855F7", bottom: -100, right: -100 }}
-      />
+      {/* Ambient glow */}
+      <div className="ambient-glow" style={{ width: 600, height: 600, background: "#7C3AED", top: -200, left: -200 }} />
+      <div className="ambient-glow" style={{ width: 400, height: 400, background: "#A855F7", bottom: -100, right: -100 }} />
 
-      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((c) => !c)} />
+      {/* Mobile overlay backdrop */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-      <div className="relative flex flex-1 flex-col overflow-hidden">
+      {/* Sidebar — hidden on mobile unless mobileOpen, always visible on md+ */}
+      <div className={`fixed inset-y-0 left-0 z-50 md:relative md:z-auto md:flex transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+        <Sidebar
+          collapsed={collapsed}
+          onToggle={() => setCollapsed((c) => !c)}
+          onClose={() => setMobileOpen(false)}
+        />
+      </div>
+
+      {/* Main content */}
+      <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         <Switch>
-          <Route path="/" component={Dashboard} />
-          <Route path="/admin" component={Admin} />
+          <Route path="/" component={() => <Dashboard onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>
       </div>
