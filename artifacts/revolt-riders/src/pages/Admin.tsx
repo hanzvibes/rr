@@ -1,110 +1,139 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Eye, EyeOff, LogOut, Plus, RefreshCw, Save, Trash2, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Eye, EyeOff, LogOut, Plus, RefreshCw, Save, Trash2, X, Search } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
-import { numFmt, badgeColor, calcTotalKm, cn } from "@/lib/utils";
+import { numFmt, calcTotalKm, cn } from "@/lib/utils";
 import type { Rider } from "@/lib/types";
+import { Topbar } from "@/components/layout/Topbar";
 
 const JABATAN_LIST = ["FOUNDER", "PRESIDENT", "EXCECUTOR", "NEGOSIATOR", "LIFE MEMBER", "VIRGIN", "CAPROS", "PROSPEK"];
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "revolt2026";
 const SESSION_KEY = "rr_admin_auth";
 
-function RankBadge({ jabatan }: { jabatan: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-block px-1.5 py-0.5 text-[0.5rem] tracking-widest uppercase clip-slant-sm",
-        badgeColor(jabatan)
-      )}
-    >
-      {jabatan}
-    </span>
-  );
+function rankBadgeClass(jabatan: string): string {
+  const j = jabatan?.toUpperCase();
+  if (j === "FOUNDER") return "badge-red";
+  if (j === "PRESIDENT") return "badge-yellow";
+  if (j === "EXCECUTOR") return "badge-purple";
+  if (j === "NEGOSIATOR") return "badge-blue";
+  if (j === "LIFE MEMBER") return "badge-cyan";
+  if (j === "VIRGIN") return "badge-green";
+  if (j === "CAPROS") return "badge-yellow";
+  return "badge-gray";
 }
 
 type FormData = {
-  no: string;
-  nama: string;
-  alamat: string;
-  ttl: string;
-  bergabung: string;
-  jabatan: string;
-  aktivitas: string;
+  no: string; nama: string; alamat: string; ttl: string;
+  bergabung: string; jabatan: string; aktivitas: string;
 };
 
 const EMPTY_FORM: FormData = {
   no: "", nama: "", alamat: "", ttl: "", bergabung: "", jabatan: "PROSPEK", aktivitas: "",
 };
 
+/* ── Login Screen ────────────────────────────────────────────── */
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [pw, setPw] = useState("");
   const [show, setShow] = useState(false);
   const [error, setError] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
+  const ref = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { inputRef.current?.focus(); }, []);
+  useEffect(() => { ref.current?.focus(); }, []);
 
-  function handleSubmit() {
+  function submit() {
     if (pw === ADMIN_PASSWORD) {
       sessionStorage.setItem(SESSION_KEY, "1");
       onLogin();
     } else {
-      setError("Password salah. Coba lagi.");
+      setError("Incorrect password. Try again.");
       setPw("");
       setTimeout(() => setError(""), 3000);
     }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[hsl(30_8%_4%)] px-4">
-      <div className="w-full max-w-sm animate-fade-in">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="clip-slant flex h-10 w-10 items-center justify-center bg-[#c9973b] text-[hsl(30_8%_4%)]">
-            R
+    <div className="flex flex-1 items-center justify-center px-4 py-12 bg-[#0A0A0A]">
+      {/* Ambient glow */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-[#7C3AED] opacity-[0.06] blur-[120px]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+        className="relative w-full max-w-sm"
+      >
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] shadow-2xl shadow-purple-900/40">
+            <span className="text-xl font-bold text-white">R</span>
           </div>
-          <div>
-            <h1 className="text-sm tracking-widest uppercase text-[hsl(35_20%_85%)]">Admin Panel</h1>
-            <p className="text-[0.55rem] tracking-wider text-[hsl(35_15%_40%)]">REVOLT RIDERS</p>
-          </div>
+          <h1 className="text-2xl font-semibold text-white tracking-tight">Admin Access</h1>
+          <p className="mt-2 text-[0.8rem] text-[#71717A]">Revolt Riders — Protected Panel</p>
         </div>
 
-        <div className="rounded border border-[hsl(35_10%_15%)] bg-[hsl(30_6%_6%)] p-6">
-          <p className="label-upper mb-4">Masukkan Password Admin</p>
-
-          <div className="relative mb-3">
-            <input
-              ref={inputRef}
-              type={show ? "text" : "password"}
-              value={pw}
-              onChange={(e) => { setPw(e.target.value); setError(""); }}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSubmit(); }}
-              placeholder="Password..."
-              className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_4%)] px-3 py-2 pr-10 text-[0.7rem] text-[hsl(35_20%_82%)] placeholder-[hsl(35_15%_38%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-            />
-            <button
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(35_15%_40%)] hover:text-[hsl(35_20%_70%)] transition-colors"
-              onClick={() => setShow(!show)}
-            >
-              {show ? <EyeOff size={14} /> : <Eye size={14} />}
-            </button>
+        {/* Card */}
+        <div className="glass-card p-8">
+          <div className="mb-6">
+            <div className="mb-2 flex items-center justify-between">
+              <label className="text-[0.75rem] font-medium uppercase tracking-wider text-[#71717A]">Password</label>
+            </div>
+            <div className="relative">
+              <input
+                ref={ref}
+                type={show ? "text" : "password"}
+                value={pw}
+                onChange={(e) => { setPw(e.target.value); setError(""); }}
+                onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+                placeholder="Enter admin password"
+                className="input-dark w-full px-4 py-3 pr-12 text-[0.85rem]"
+              />
+              <button
+                type="button"
+                onClick={() => setShow(!show)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#71717A] hover:text-[#A1A1AA] transition-colors"
+              >
+                {show ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <AnimatePresence>
+              {error && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="mt-2 text-[0.75rem] text-red-400"
+                >
+                  {error}
+                </motion.p>
+              )}
+            </AnimatePresence>
           </div>
-
-          {error && (
-            <p className="mb-3 text-[0.65rem] text-red-400">{error}</p>
-          )}
-
-          <button
-            onClick={handleSubmit}
-            className="clip-slant w-full bg-[#c9973b] py-2 text-[0.65rem] uppercase tracking-widest text-[hsl(30_8%_4%)] transition-all hover:bg-[#d4a44a]"
-          >
-            Masuk
+          <button onClick={submit} className="btn-purple w-full py-3 text-[0.85rem] font-medium">
+            Sign In
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
 
+/* ── Form field ──────────────────────────────────────────────── */
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-1.5 flex items-center justify-between">
+        <label className="text-[0.72rem] font-medium uppercase tracking-wider text-[#71717A]">{label}</label>
+        {hint && <span className="text-[0.65rem] text-[#52525B]">{hint}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+/* ── Main Admin ──────────────────────────────────────────────── */
 export default function Admin() {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem(SESSION_KEY) === "1");
   const [riders, setRiders] = useState<Rider[]>([]);
@@ -123,7 +152,7 @@ export default function Admin() {
       if (error) throw error;
       setRiders(data || []);
     } catch {
-      toast.error("Gagal memuat data");
+      toast.error("Failed to load riders");
     } finally {
       setLoading(false);
     }
@@ -133,12 +162,12 @@ export default function Admin() {
 
   useEffect(() => {
     if (!authed) return;
-    const handler = (e: KeyboardEvent) => {
+    const fn = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); handleSave(); }
       if (e.key === "Escape") { setSelectedId(null); setForm(EMPTY_FORM); }
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener("keydown", fn);
+    return () => window.removeEventListener("keydown", fn);
   }, [authed, form, selectedId]);
 
   function selectRider(rider: Rider) {
@@ -178,20 +207,19 @@ export default function Admin() {
         aktivitas: form.aktivitas.trim(),
         total_km: calcTotalKm(form.aktivitas),
       };
-
       if (selectedId === "new") {
         const { error } = await supabase.from("riders").insert([payload]);
         if (error) throw error;
-        toast.success("Rider ditambahkan!");
+        toast.success("Rider added successfully!");
       } else {
         const { error } = await supabase.from("riders").update(payload).eq("id", selectedId);
         if (error) throw error;
-        toast.success("Rider diupdate!");
+        toast.success("Rider updated successfully!");
       }
       await fetchRiders();
       cancelEdit();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Gagal menyimpan");
+      toast.error(e instanceof Error ? e.message : "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -203,11 +231,11 @@ export default function Admin() {
     try {
       const { error } = await supabase.from("riders").delete().eq("id", selectedId);
       if (error) throw error;
-      toast.success("Rider dihapus!");
+      toast.success("Rider deleted.");
       await fetchRiders();
       cancelEdit();
     } catch (e: unknown) {
-      toast.error(e instanceof Error ? e.message : "Gagal menghapus");
+      toast.error(e instanceof Error ? e.message : "Failed to delete");
     } finally {
       setDeleting(false);
       setShowConfirm(false);
@@ -222,80 +250,74 @@ export default function Admin() {
 
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />;
 
+  const topbarActions = (
+    <>
+      <button onClick={selectNew} className="btn-purple flex items-center gap-2 px-4 py-2 text-[0.75rem] font-medium">
+        <Plus size={14} /> New Rider
+      </button>
+      <button
+        onClick={() => { sessionStorage.removeItem(SESSION_KEY); setAuthed(false); }}
+        className="btn-ghost flex items-center gap-2 px-4 py-2 text-[0.75rem] text-[#71717A] hover:text-red-400 transition-colors"
+      >
+        <LogOut size={14} /> Logout
+      </button>
+    </>
+  );
+
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Topbar */}
-      <div className="flex items-center justify-between border-b border-[hsl(35_10%_12%)] bg-[hsl(30_8%_5%)] px-4 py-2.5">
-        <div className="flex items-center gap-3">
-          <div className="clip-slant flex h-8 w-8 items-center justify-center bg-[#c9973b] text-[hsl(30_8%_4%)] text-xs">R</div>
-          <div>
-            <span className="text-[0.65rem] uppercase tracking-widest text-[hsl(35_20%_80%)]">⚙ Admin Panel</span>
-            <span className="ml-2 text-[0.55rem] text-[hsl(35_15%_42%)]">{riders.length} riders</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={selectNew}
-            className="clip-slant flex items-center gap-1.5 bg-[#c9973b] px-3 py-1.5 text-[0.6rem] uppercase tracking-wider text-[hsl(30_8%_4%)] hover:bg-[#d4a44a] transition-colors"
-          >
-            <Plus size={12} />
-            Rider
-          </button>
-          <button
-            onClick={() => { fetchRiders(); toast.info("Refreshing..."); }}
-            disabled={loading}
-            className="clip-slant flex items-center gap-1.5 border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_8%)] px-3 py-1.5 text-[0.6rem] uppercase tracking-wider text-[hsl(35_15%_60%)] hover:border-[#c9973b]/40 hover:text-[#c9973b] transition-colors disabled:opacity-40"
-          >
-            <RefreshCw size={12} className={loading ? "animate-spin" : ""} />
-          </button>
-          <button
-            onClick={() => { sessionStorage.removeItem(SESSION_KEY); setAuthed(false); }}
-            className="clip-slant flex items-center gap-1.5 border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_8%)] px-3 py-1.5 text-[0.6rem] uppercase tracking-wider text-[hsl(35_15%_60%)] hover:border-red-700/50 hover:text-red-400 transition-colors"
-          >
-            <LogOut size={12} />
-            <span className="hidden sm:inline">Logout</span>
-          </button>
-        </div>
-      </div>
+    <div className="flex flex-1 flex-col overflow-hidden">
+      <Topbar
+        title="Admin Panel"
+        subtitle={`${riders.length} riders total`}
+        onRefresh={fetchRiders}
+        loading={loading}
+        actions={topbarActions}
+      />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Left Panel: Rider List */}
-        <div className="flex w-64 flex-shrink-0 flex-col border-r border-[hsl(35_10%_12%)] bg-[hsl(30_6%_5%)]">
-          <div className="border-b border-[hsl(35_10%_12%)] px-3 py-2">
-            <input
-              type="search"
-              placeholder="Cari nama..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded border border-[hsl(35_10%_16%)] bg-[hsl(30_6%_4%)] px-2.5 py-1.5 text-[0.65rem] text-[hsl(35_20%_78%)] placeholder-[hsl(35_15%_38%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-            />
+        {/* Left — Rider List */}
+        <div className="flex w-72 flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]">
+          {/* Search */}
+          <div className="border-b border-[rgba(39,39,42,0.6)] p-3">
+            <div className="relative">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]" />
+              <input
+                type="search"
+                placeholder="Search name..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="input-dark w-full pl-9 pr-3 py-2.5 text-[0.78rem]"
+              />
+            </div>
           </div>
+
+          {/* List */}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
-              <div className="flex h-20 items-center justify-center">
-                <RefreshCw size={14} className="animate-spin text-[#c9973b]" />
+              <div className="flex h-24 items-center justify-center">
+                <RefreshCw size={16} className="animate-spin text-[#8B5CF6]" />
               </div>
             ) : filteredRiders.length === 0 ? (
-              <p className="py-6 text-center text-[0.6rem] text-[hsl(35_15%_40%)]">No riders</p>
+              <p className="py-8 text-center text-[0.75rem] text-[#52525B]">No riders found</p>
             ) : (
               filteredRiders.map((rider) => (
                 <button
                   key={rider.id}
                   onClick={() => selectRider(rider)}
                   className={cn(
-                    "w-full border-b border-[hsl(35_10%_10%)] px-3 py-2.5 text-left transition-all hover:bg-[hsl(30_6%_8%)]",
-                    selectedId === rider.id ? "bg-[hsl(30_8%_9%)] border-l-2 border-l-[#c9973b]" : ""
+                    "w-full border-b border-[rgba(39,39,42,0.4)] px-4 py-3 text-left transition-all hover:bg-[rgba(255,255,255,0.03)]",
+                    selectedId === rider.id && "bg-[rgba(139,92,246,0.08)] border-l-2 border-l-[#8B5CF6]"
                   )}
                 >
-                  <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-[0.55rem] text-[hsl(35_15%_42%)]">#{rider.no}</span>
-                        <span className="truncate text-[0.65rem] text-[hsl(35_20%_80%)]">{rider.nama}</span>
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <span className="text-[0.65rem] font-medium text-[#52525B]">#{rider.no}</span>
+                        <span className="truncate text-[0.78rem] font-medium text-[#A1A1AA]">{rider.nama}</span>
                       </div>
-                      <RankBadge jabatan={rider.jabatan} />
+                      <span className={rankBadgeClass(rider.jabatan)}>{rider.jabatan}</span>
                     </div>
-                    <span className="flex-shrink-0 text-[0.6rem] text-[#c9973b]">{numFmt(rider.total_km || 0)}</span>
+                    <span className="flex-shrink-0 text-[0.75rem] font-semibold text-[#8B5CF6]">{numFmt(rider.total_km || 0)}</span>
                   </div>
                 </button>
               ))
@@ -303,184 +325,213 @@ export default function Admin() {
           </div>
         </div>
 
-        {/* Right Panel: Editor */}
-        <div className="flex-1 overflow-y-auto bg-[hsl(30_8%_4%)] p-5">
-          {!selectedId ? (
-            <div className="flex h-full items-center justify-center">
-              <div className="text-center">
-                <div className="clip-slant mx-auto mb-4 flex h-14 w-14 items-center justify-center bg-[hsl(30_6%_8%)] text-[hsl(35_15%_35%)]">
-                  <Plus size={24} />
+        {/* Right — Editor */}
+        <div className="flex-1 overflow-y-auto bg-[#0A0A0A] p-6">
+          <AnimatePresence mode="wait">
+            {!selectedId ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex h-full items-center justify-center"
+              >
+                <div className="text-center">
+                  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.03)] text-[#52525B]">
+                    <Plus size={28} />
+                  </div>
+                  <p className="text-[0.85rem] font-medium text-[#52525B]">Select a rider to edit</p>
+                  <p className="mt-1 text-[0.75rem] text-[#3F3F46]">or create a new rider</p>
                 </div>
-                <p className="text-[0.7rem] text-[hsl(35_15%_40%)]">Pilih rider atau tambah baru</p>
-              </div>
-            </div>
-          ) : (
-            <div className="mx-auto max-w-xl animate-fade-in">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-[0.75rem] uppercase tracking-widest text-[hsl(35_20%_80%)]">
-                  {selectedId === "new" ? "Tambah Rider Baru" : "Edit Rider"}
-                </h2>
-                <button onClick={cancelEdit} className="text-[hsl(35_15%_40%)] hover:text-[hsl(35_20%_70%)] transition-colors">
-                  <X size={16} />
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                {/* Row: No + Nama */}
-                <div className="grid grid-cols-4 gap-3">
+              </motion.div>
+            ) : (
+              <motion.div
+                key={selectedId}
+                initial={{ opacity: 0, x: 12 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.2 }}
+                className="mx-auto max-w-xl"
+              >
+                {/* Form header */}
+                <div className="mb-6 flex items-center justify-between">
                   <div>
-                    <label className="label-upper block mb-1">No</label>
-                    <input
-                      type="number"
-                      value={form.no}
-                      onChange={(e) => setForm({ ...form, no: e.target.value })}
-                      className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-                    />
+                    <h2 className="text-[0.95rem] font-semibold text-white">
+                      {selectedId === "new" ? "New Rider" : "Edit Rider"}
+                    </h2>
+                    <p className="mt-0.5 text-[0.72rem] text-[#71717A]">
+                      {selectedId === "new" ? "Add a new member to the club" : "Update member information"}
+                    </p>
                   </div>
-                  <div className="col-span-3">
-                    <label className="label-upper block mb-1">Nama</label>
-                    <input
-                      type="text"
-                      value={form.nama}
-                      onChange={(e) => setForm({ ...form, nama: e.target.value })}
-                      className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Alamat */}
-                <div>
-                  <label className="label-upper block mb-1">Chapter / Alamat</label>
-                  <input
-                    type="text"
-                    value={form.alamat}
-                    onChange={(e) => setForm({ ...form, alamat: e.target.value })}
-                    className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-                  />
-                </div>
-
-                {/* TTL + Bergabung */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="label-upper block mb-1">TTL</label>
-                    <input
-                      type="text"
-                      value={form.ttl}
-                      onChange={(e) => setForm({ ...form, ttl: e.target.value })}
-                      placeholder="Kota, DD-MM-YYYY"
-                      className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] placeholder-[hsl(35_15%_35%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-                    />
-                  </div>
-                  <div>
-                    <label className="label-upper block mb-1">Bergabung</label>
-                    <input
-                      type="text"
-                      value={form.bergabung}
-                      onChange={(e) => setForm({ ...form, bergabung: e.target.value })}
-                      placeholder="YYYY-MM-DD"
-                      className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] placeholder-[hsl(35_15%_35%)] outline-none focus:border-[#c9973b]/50 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                {/* Jabatan */}
-                <div>
-                  <label className="label-upper block mb-1">Jabatan</label>
-                  <select
-                    value={form.jabatan}
-                    onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
-                    className="w-full rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] outline-none focus:border-[#c9973b]/50 cursor-pointer transition-colors"
-                  >
-                    {JABATAN_LIST.map((j) => <option key={j} value={j}>{j}</option>)}
-                  </select>
-                </div>
-
-                {/* Aktivitas */}
-                <div>
-                  <label className="label-upper block mb-1">Aktivitas</label>
-                  <p className="mb-1.5 text-[0.55rem] text-[hsl(35_15%_38%)]">Format: NamaRun:km; NamaRun:km;</p>
-                  <textarea
-                    value={form.aktivitas}
-                    onChange={(e) => setForm({ ...form, aktivitas: e.target.value })}
-                    rows={4}
-                    placeholder="Sunday Ride:150; Night Ride:80;"
-                    className="w-full resize-y rounded border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_5%)] px-2.5 py-2 text-[0.7rem] text-[hsl(35_20%_82%)] placeholder-[hsl(35_15%_35%)] outline-none focus:border-[#c9973b]/50 transition-colors font-[inherit]"
-                  />
-                </div>
-
-                {/* Total KM (auto) */}
-                <div>
-                  <label className="label-upper block mb-1">Total KM (auto)</label>
-                  <div className="flex items-center gap-2 rounded border border-amber-900/30 bg-amber-950/20 px-3 py-2">
-                    <span className="text-xl text-[#c9973b]">{numFmt(totalKm)}</span>
-                    <span className="text-[0.6rem] text-amber-700">km</span>
-                  </div>
-                </div>
-
-                {/* Action buttons */}
-                <div className="flex items-center gap-2 pt-2">
-                  <button
-                    onClick={handleSave}
-                    disabled={saving}
-                    className="clip-slant flex flex-1 items-center justify-center gap-1.5 bg-[#c9973b] py-2.5 text-[0.65rem] uppercase tracking-wider text-[hsl(30_8%_4%)] hover:bg-[#d4a44a] disabled:opacity-60 transition-colors"
-                  >
-                    <Save size={13} />
-                    {saving ? "Menyimpan..." : "Simpan (Ctrl+S)"}
+                  <button onClick={cancelEdit} className="btn-ghost h-9 w-9 flex items-center justify-center p-0">
+                    <X size={16} />
                   </button>
-                  {selectedId !== "new" && (
-                    <button
-                      onClick={() => setShowConfirm(true)}
-                      disabled={deleting}
-                      className="clip-slant flex items-center gap-1.5 border border-red-800/50 bg-red-950/30 px-3 py-2.5 text-[0.65rem] uppercase tracking-wider text-red-400 hover:bg-red-950/50 disabled:opacity-60 transition-colors"
+                </div>
+
+                <div className="space-y-4">
+                  {/* No + Nama */}
+                  <div className="grid grid-cols-4 gap-3">
+                    <Field label="No">
+                      <input
+                        type="number"
+                        value={form.no}
+                        onChange={(e) => setForm({ ...form, no: e.target.value })}
+                        className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+                      />
+                    </Field>
+                    <div className="col-span-3">
+                      <Field label="Full Name">
+                        <input
+                          type="text"
+                          value={form.nama}
+                          onChange={(e) => setForm({ ...form, nama: e.target.value })}
+                          placeholder="Rider name..."
+                          className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+                        />
+                      </Field>
+                    </div>
+                  </div>
+
+                  {/* Alamat */}
+                  <Field label="Chapter / Alamat">
+                    <input
+                      type="text"
+                      value={form.alamat}
+                      onChange={(e) => setForm({ ...form, alamat: e.target.value })}
+                      placeholder="City or chapter..."
+                      className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+                    />
+                  </Field>
+
+                  {/* TTL + Bergabung */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <Field label="TTL">
+                      <input
+                        type="text"
+                        value={form.ttl}
+                        onChange={(e) => setForm({ ...form, ttl: e.target.value })}
+                        placeholder="City, DD-MM-YYYY"
+                        className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+                      />
+                    </Field>
+                    <Field label="Bergabung">
+                      <input
+                        type="text"
+                        value={form.bergabung}
+                        onChange={(e) => setForm({ ...form, bergabung: e.target.value })}
+                        placeholder="YYYY-MM-DD"
+                        className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+                      />
+                    </Field>
+                  </div>
+
+                  {/* Jabatan */}
+                  <Field label="Jabatan / Rank">
+                    <select
+                      value={form.jabatan}
+                      onChange={(e) => setForm({ ...form, jabatan: e.target.value })}
+                      className="input-dark w-full px-3 py-2.5 text-[0.82rem] cursor-pointer"
                     >
-                      <Trash2 size={13} />
+                      {JABATAN_LIST.map((j) => <option key={j}>{j}</option>)}
+                    </select>
+                  </Field>
+
+                  {/* Aktivitas */}
+                  <Field label="Aktivitas / Run Log" hint="Format: NamaRun:km; NamaRun:km;">
+                    <textarea
+                      value={form.aktivitas}
+                      onChange={(e) => setForm({ ...form, aktivitas: e.target.value })}
+                      rows={5}
+                      placeholder="Sunday Ride:150; Night Ride:80; Touring Bali:320;"
+                      className="input-dark w-full resize-y px-3 py-2.5 text-[0.82rem] font-[inherit]"
+                    />
+                  </Field>
+
+                  {/* Auto Total KM */}
+                  <div className="rounded-xl border border-[rgba(139,92,246,0.2)] bg-gradient-to-br from-[rgba(139,92,246,0.08)] to-transparent p-4">
+                    <p className="mb-1 text-[0.7rem] font-medium uppercase tracking-wider text-[#8B5CF6]">Auto-calculated Total KM</p>
+                    <p className="text-3xl font-bold text-white">
+                      {numFmt(totalKm)} <span className="text-lg font-medium text-[#8B5CF6]">km</span>
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="btn-purple flex flex-1 items-center justify-center gap-2 py-3 text-[0.82rem] font-medium disabled:opacity-50"
+                    >
+                      <Save size={15} />
+                      {saving ? "Saving..." : "Save Changes"}
                     </button>
-                  )}
-                  <button
-                    onClick={cancelEdit}
-                    className="clip-slant flex items-center gap-1.5 border border-[hsl(35_10%_18%)] bg-[hsl(30_6%_8%)] px-3 py-2.5 text-[0.65rem] uppercase tracking-wider text-[hsl(35_15%_55%)] hover:text-[hsl(35_20%_75%)] transition-colors"
-                  >
-                    Batal
-                  </button>
+                    {selectedId !== "new" && (
+                      <button
+                        onClick={() => setShowConfirm(true)}
+                        disabled={deleting}
+                        className="flex h-11 w-11 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all disabled:opacity-50"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                    <button
+                      onClick={cancelEdit}
+                      className="btn-ghost flex items-center gap-2 px-4 py-3 text-[0.82rem] text-[#71717A]"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      {/* Delete Confirm Dialog */}
-      {showConfirm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-          onClick={() => setShowConfirm(false)}
-        >
-          <div
-            className="mx-4 w-full max-w-sm rounded border border-red-800/40 bg-[hsl(30_8%_7%)] p-6 animate-fade-in"
-            onClick={(e) => e.stopPropagation()}
+      {/* Delete confirm */}
+      <AnimatePresence>
+        {showConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowConfirm(false)}
           >
-            <h3 className="mb-2 text-[0.75rem] uppercase tracking-wider text-red-400">Hapus Rider</h3>
-            <p className="mb-5 text-[0.68rem] text-[hsl(35_15%_55%)]">
-              Apakah kamu yakin ingin menghapus rider ini? Tindakan ini tidak bisa dibatalkan.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="clip-slant flex-1 bg-red-700 py-2 text-[0.65rem] uppercase tracking-wider text-white hover:bg-red-600 disabled:opacity-60 transition-colors"
-              >
-                {deleting ? "Menghapus..." : "Ya, Hapus"}
-              </button>
-              <button
-                onClick={() => setShowConfirm(false)}
-                className="clip-slant flex-1 border border-[hsl(35_10%_18%)] py-2 text-[0.65rem] uppercase tracking-wider text-[hsl(35_15%_55%)] hover:text-[hsl(35_20%_75%)] transition-colors"
-              >
-                Batal
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="mx-4 w-full max-w-sm rounded-2xl border border-red-500/20 bg-[#111111] p-6 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl border border-red-500/20 bg-red-500/10 text-red-400">
+                <Trash2 size={20} />
+              </div>
+              <h3 className="mb-2 text-base font-semibold text-white">Delete Rider</h3>
+              <p className="mb-6 text-[0.8rem] text-[#71717A]">
+                Are you sure? This action cannot be undone and will permanently remove the rider from the database.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="flex-1 rounded-xl bg-red-600 py-2.5 text-[0.82rem] font-medium text-white hover:bg-red-500 disabled:opacity-60 transition-colors"
+                >
+                  {deleting ? "Deleting..." : "Yes, Delete"}
+                </button>
+                <button
+                  onClick={() => setShowConfirm(false)}
+                  className="btn-ghost flex-1 py-2.5 text-[0.82rem]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
