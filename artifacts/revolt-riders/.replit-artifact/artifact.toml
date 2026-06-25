@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "REVOLT RIDERS Dashboard"
+version = "1.0.0"
+id = "artifacts/revolt-riders"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 21543
+
+[services.development]
+run = "pnpm --filter @workspace/revolt-riders run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/revolt-riders", "run", "build" ]
+publicDir = "artifacts/revolt-riders/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "21543"
+BASE_PATH = "/"

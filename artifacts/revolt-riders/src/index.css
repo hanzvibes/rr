@@ -1,0 +1,226 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400&display=swap");
+@import "tailwindcss";
+@import "tw-animate-css";
+@plugin "@tailwindcss/typography";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card-border: hsl(var(--card-border));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover-border: hsl(var(--popover-border));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-border: var(--primary-border);
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary-border: var(--secondary-border);
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-border: var(--muted-border);
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent-border: var(--accent-border);
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive-border: var(--destructive-border);
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --font-sans: var(--app-font-sans);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --button-outline: rgba(0,0,0,.10);
+  --badge-outline: rgba(0,0,0,.05);
+  --opaque-button-border-intensity: -8;
+  --elevate-1: rgba(0,0,0,.03);
+  --elevate-2: rgba(0,0,0,.08);
+  --background: 30 8% 4%;
+  --foreground: 35 20% 85%;
+  --border: 35 10% 15%;
+  --card: 30 6% 6%;
+  --card-foreground: 35 20% 85%;
+  --card-border: 35 10% 15%;
+  --sidebar: 30 6% 6%;
+  --sidebar-foreground: 35 20% 85%;
+  --sidebar-border: 35 10% 15%;
+  --sidebar-primary: 37 59% 51%;
+  --sidebar-primary-foreground: 30 8% 4%;
+  --sidebar-accent: 30 8% 8%;
+  --sidebar-accent-foreground: 35 20% 85%;
+  --sidebar-ring: 37 59% 51%;
+  --popover: 30 8% 6%;
+  --popover-foreground: 35 20% 85%;
+  --popover-border: 35 10% 18%;
+  --primary: 37 59% 51%;
+  --primary-foreground: 30 8% 4%;
+  --secondary: 30 8% 10%;
+  --secondary-foreground: 35 20% 75%;
+  --muted: 30 6% 10%;
+  --muted-foreground: 35 15% 50%;
+  --accent: 37 59% 51%;
+  --accent-foreground: 30 8% 4%;
+  --destructive: 0 62% 45%;
+  --destructive-foreground: 0 0% 95%;
+  --input: 35 10% 18%;
+  --ring: 37 59% 51%;
+  --chart-1: 37 59% 51%;
+  --chart-2: 200 60% 50%;
+  --chart-3: 270 55% 55%;
+  --chart-4: 140 50% 45%;
+  --chart-5: 0 60% 50%;
+  --app-font-sans: "Poppins", sans-serif;
+  --radius: 0.25rem;
+  --sidebar-primary-border: hsl(var(--sidebar-primary));
+  --sidebar-primary-border: hsl(from hsl(var(--sidebar-primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --sidebar-accent-border: hsl(var(--sidebar-accent));
+  --primary-border: hsl(var(--primary));
+  --primary-border: hsl(from hsl(var(--primary)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
+  --secondary-border: hsl(var(--secondary));
+  --muted-border: hsl(var(--muted));
+  --accent-border: hsl(var(--accent));
+  --destructive-border: hsl(var(--destructive));
+  --amber: #c9973b;
+}
+
+.dark {
+  --button-outline: rgba(255,255,255,.10);
+  --badge-outline: rgba(255,255,255,.05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255,255,255,.04);
+  --elevate-2: rgba(255,255,255,.09);
+  --background: 30 8% 4%;
+  --foreground: 35 20% 85%;
+  --border: 35 10% 15%;
+  --card: 30 6% 6%;
+  --card-foreground: 35 20% 85%;
+  --card-border: 35 10% 15%;
+  --popover: 30 8% 6%;
+  --popover-foreground: 35 20% 85%;
+  --popover-border: 35 10% 18%;
+  --primary: 37 59% 51%;
+  --primary-foreground: 30 8% 4%;
+  --secondary: 30 8% 10%;
+  --secondary-foreground: 35 20% 75%;
+  --muted: 30 6% 10%;
+  --muted-foreground: 35 15% 50%;
+  --accent: 37 59% 51%;
+  --accent-foreground: 30 8% 4%;
+  --destructive: 0 62% 45%;
+  --destructive-foreground: 0 0% 95%;
+  --input: 35 10% 18%;
+  --ring: 37 59% 51%;
+  --chart-1: 37 59% 51%;
+  --chart-2: 200 60% 50%;
+  --chart-3: 270 55% 55%;
+  --chart-4: 140 50% 45%;
+  --chart-5: 0 60% 50%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    font-weight: 400;
+  }
+  body {
+    font-family: "Poppins", sans-serif;
+    font-weight: 400;
+    background-color: hsl(30 8% 4%);
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(201,151,59,0.06) 0%, transparent 60%),
+                      radial-gradient(ellipse at 80% 20%, rgba(201,151,59,0.04) 0%, transparent 50%);
+    color: hsl(35 20% 85%);
+    -webkit-font-smoothing: antialiased;
+  }
+  strong, b, h1, h2, h3, h4, h5, h6 {
+    font-weight: 400;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: hsl(30 8% 4%); }
+::-webkit-scrollbar-thumb { background: hsl(35 10% 18%); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(37 59% 51% / 0.5); }
+
+/* Slanted clip-path for badges and buttons */
+.clip-slant {
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+}
+.clip-slant-sm {
+  clip-path: polygon(0 0, calc(100% - 5px) 0, 100% 5px, 100% 100%, 5px 100%, 0 calc(100% - 5px));
+}
+
+/* Card with top gradient border */
+.card-accent-top {
+  position: relative;
+}
+.card-accent-top::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #c9973b 40%, #e8b96a 60%, transparent 100%);
+  border-radius: inherit;
+  z-index: 1;
+}
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+.animate-fade-in-delay-1 { animation-delay: 0.05s; opacity: 0; animation-fill-mode: forwards; }
+.animate-fade-in-delay-2 { animation-delay: 0.10s; opacity: 0; animation-fill-mode: forwards; }
+.animate-fade-in-delay-3 { animation-delay: 0.15s; opacity: 0; animation-fill-mode: forwards; }
+.animate-fade-in-delay-4 { animation-delay: 0.20s; opacity: 0; animation-fill-mode: forwards; }
+.animate-fade-in-delay-5 { animation-delay: 0.25s; opacity: 0; animation-fill-mode: forwards; }
+.animate-fade-in-delay-6 { animation-delay: 0.30s; opacity: 0; animation-fill-mode: forwards; }
+
+/* Table row hover with amber left inset */
+.tr-hover:hover {
+  background-color: hsl(30 8% 8%);
+  box-shadow: inset 3px 0 0 #c9973b;
+}
+
+/* Amber glow on card hover */
+.card-hover:hover {
+  border-color: rgba(201,151,59,0.4) !important;
+  box-shadow: 0 0 16px rgba(201,151,59,0.12);
+  transition: all 0.2s ease;
+}
+
+/* Uppercase tracking */
+.label-upper {
+  font-size: 0.55rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: hsl(35 15% 50%);
+}
+
+/* Recharts dark tooltip override */
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background-color: hsl(30 8% 8%) !important;
+  border: 1px solid hsl(35 10% 18%) !important;
+  border-radius: 4px !important;
+}

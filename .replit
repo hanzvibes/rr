@@ -18,3 +18,10 @@ expertMode = true
 [postMerge]
 path = "scripts/post-merge.sh"
 timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+VITE_SUPABASE_URL = "https://xlrrxgbckpmpagvtzrry.supabase.co"
+VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhscnJ4Z2Jja3BtcGFndnR6cnJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzOTMwNTQsImV4cCI6MjA5Nzk2OTA1NH0.z1NPfW-ZdNH_vsWS7Y6zw65WRgqCfCp55FEg3JmYd4s"
+VITE_ADMIN_PASSWORD = "revolt2026"
