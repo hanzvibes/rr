@@ -1,11 +1,12 @@
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, Trophy, X } from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, Trophy, Bike, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
+  { label: "Run History", icon: Bike, href: "/runs" },
   { label: "Admin Panel", icon: Shield, href: "/admin" },
 ];
 
@@ -25,7 +26,7 @@ export function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
       className="flex flex-shrink-0 flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]"
       style={{ minHeight: "100dvh" }}
     >
-      {/* Logo row */}
+      {/* Logo */}
       <div className="flex h-16 items-center justify-between border-b border-[rgba(39,39,42,0.6)] px-4">
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] shadow-lg shadow-purple-900/30">
@@ -46,7 +47,6 @@ export function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
             )}
           </AnimatePresence>
         </div>
-        {/* Mobile close button */}
         {onClose && !collapsed && (
           <button
             onClick={onClose}
@@ -97,7 +97,7 @@ export function Sidebar({ collapsed, onToggle, onClose }: SidebarProps) {
         })}
       </nav>
 
-      {/* Collapse button — desktop only */}
+      {/* Collapse — desktop only */}
       <div className="hidden md:block border-t border-[rgba(39,39,42,0.6)] p-3">
         <button
           onClick={onToggle}

@@ -5,6 +5,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import Dashboard from "@/pages/Dashboard";
 import Admin from "@/pages/Admin";
 import Leaderboard from "@/pages/Leaderboard";
+import RunHistory from "@/pages/RunHistory";
 import NotFound from "@/pages/not-found";
 
 function Layout() {
@@ -18,11 +19,9 @@ function Layout() {
 
   return (
     <div className="flex min-h-screen bg-[#0A0A0A]">
-      {/* Ambient glow */}
       <div className="ambient-glow" style={{ width: 600, height: 600, background: "#7C3AED", top: -200, left: -200 }} />
       <div className="ambient-glow" style={{ width: 400, height: 400, background: "#A855F7", bottom: -100, right: -100 }} />
 
-      {/* Mobile overlay backdrop */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
@@ -30,7 +29,6 @@ function Layout() {
         />
       )}
 
-      {/* Sidebar */}
       <div className={`fixed inset-y-0 left-0 z-50 md:relative md:z-auto md:flex transition-transform duration-300 ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
         <Sidebar
           collapsed={collapsed}
@@ -39,11 +37,11 @@ function Layout() {
         />
       </div>
 
-      {/* Main content */}
       <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         <Switch>
           <Route path="/" component={() => <Dashboard onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/leaderboard" component={() => <Leaderboard onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/runs" component={() => <RunHistory onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>
