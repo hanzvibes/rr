@@ -36,7 +36,7 @@ function rankBadgeClass(jabatan: string): string {
 }
 
 /* ── Animated counter ─────────────────────────────────────────── */
-function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
+function AnimatedNumber({ value }: { value: number }) {
   const [display, setDisplay] = useState(0);
   const ref = useRef(value);
   useEffect(() => {
@@ -53,7 +53,7 @@ function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string
     requestAnimationFrame(tick);
     ref.current = value;
   }, [value]);
-  return <span>{display.toLocaleString("id-ID")}{suffix}</span>;
+  return <span>{display.toLocaleString("id-ID")}</span>;
 }
 
 /* ── Sparkline ──────────────────────────────────────────────────── */
@@ -83,27 +83,54 @@ interface StatCardProps {
 function StatCard({ label, value, suffix = "", sub, icon: Icon, accent, sparkline, delay = 0 }: StatCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.18, delay }}
-      className="glass-card p-4 md:p-5 flex flex-col gap-3"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay }}
+      className="glass-card p-4 md:p-5 flex flex-col gap-3 relative overflow-hidden"
     >
+      {accent && <div className="stat-accent-line" />}
       <div className="flex items-start justify-between">
         <div className={cn(
-          "flex h-9 w-9 items-center justify-center rounded-xl",
+          "flex h-8 w-8 items-center justify-center rounded-lg",
           accent
-            ? "bg-gradient-to-br from-[#7C3AED]/30 to-[#A855F7]/20 border border-purple-500/20 text-[#A855F7]"
-            : "bg-[rgba(255,255,255,0.06)] border border-[rgba(39,39,42,0.8)] text-[#71717A]"
-        )}>
-          <Icon size={16} />
+            ? "text-[#A855F7]"
+            : "text-[#52525B]"
+        )}
+          style={accent ? {
+            background: "linear-gradient(135deg, rgba(124,58,237,0.25) 0%, rgba(168,85,247,0.12) 100%)",
+            border: "1px solid rgba(139,92,246,0.2)",
+            boxShadow: "0 0 12px rgba(139,92,246,0.15)"
+          } : {
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.07)"
+          }}
+        >
+          <Icon size={15} />
         </div>
+        {sub && (
+          <span className="text-[0.58rem] text-[#3F3F46] font-medium uppercase tracking-wider truncate max-w-[80px] text-right">
+            {sub}
+          </span>
+        )}
       </div>
       <div>
-        <p className="text-[0.66rem] font-medium text-[#71717A] tracking-wide uppercase">{label}</p>
-        <p className={cn("text-xl md:text-2xl font-bold mt-0.5 leading-none", accent ? "text-[#A855F7]" : "text-white")}>
-          <AnimatedNumber value={value} suffix={suffix} />
-        </p>
-        {sub && <p className="mt-1 text-[0.65rem] text-[#71717A] truncate">{sub}</p>}
+        <p className="text-[0.62rem] font-medium text-[#3F3F46] tracking-[0.08em] uppercase mb-1.5">{label}</p>
+        <div className="flex items-baseline gap-1.5">
+          <p className={cn(
+            "font-extrabold leading-none tracking-tight",
+            accent ? "text-[#C4B5FD]" : "text-white",
+            value > 9999 ? "text-[1.5rem] md:text-[1.7rem]" : "text-[1.7rem] md:text-[2rem]"
+          )}
+            style={{ fontVariantNumeric: "tabular-nums", letterSpacing: "-0.04em" }}
+          >
+            <AnimatedNumber value={value} />
+          </p>
+          {suffix && (
+            <span className={cn("text-[0.7rem] font-semibold", accent ? "text-[#8B5CF6]" : "text-[#52525B]")}>
+              {suffix.trim()}
+            </span>
+          )}
+        </div>
       </div>
       {sparkline && <Sparkline data={sparkline} />}
     </motion.div>
@@ -266,6 +293,10 @@ function FilterDrawer({
 /* ── Rider modal ────────────────────────────────────────────────── */
 function RiderModal({ rider, onClose }: { rider: Rider; onClose: () => void }) {
   const runs = parseRuns(rider.aktivitas);
+  const totalKm = runs.reduce((s, r) => s + r.km, 0);
+  const avgKm = runs.length > 0 ? Math.round(totalKm / runs.length) : 0;
+  const topRun = runs.length > 0 ? Math.max(...runs.map((r) => r.km)) : 0;
+
   useEffect(() => {
     const fn = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", fn);
@@ -274,72 +305,144 @@ function RiderModal({ rider, onClose }: { rider: Rider; onClose: () => void }) {
 
   return (
     <AnimatePresence>
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
-        onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.18 }}
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+        style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(12px)" }}
+        onClick={onClose}
+      >
         <motion.div
-          initial={{ y: "100%", opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: "100%", opacity: 0 }}
-          transition={{ type: "tween", duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-          className="relative w-full sm:max-w-md overflow-hidden rounded-t-2xl sm:rounded-2xl border border-[rgba(39,39,42,0.8)] bg-[#111111] shadow-2xl shadow-black/60 max-h-[92dvh] overflow-y-auto"
+          initial={{ y: 32, opacity: 0, scale: 0.97 }}
+          animate={{ y: 0, opacity: 1, scale: 1 }}
+          exit={{ y: 24, opacity: 0, scale: 0.97 }}
+          transition={{ type: "tween", duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+          className="relative w-full sm:max-w-md overflow-hidden rounded-t-2xl sm:rounded-2xl max-h-[92dvh] overflow-y-auto"
+          style={{
+            background: "linear-gradient(160deg, #161616 0%, #111111 100%)",
+            border: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(139,92,246,0.08) inset",
+          }}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Top shimmer */}
+          <div className="absolute top-0 left-0 right-0 h-px"
+            style={{ background: "linear-gradient(to right, transparent, rgba(139,92,246,0.6), transparent)" }} />
+
           {/* Drag handle on mobile */}
           <div className="flex justify-center pt-3 pb-1 sm:hidden">
-            <div className="h-1 w-10 rounded-full bg-[#27272A]" />
+            <div className="h-1 w-10 rounded-full" style={{ background: "rgba(255,255,255,0.1)" }} />
           </div>
 
           {/* Header */}
-          <div className="relative bg-gradient-to-br from-[#7C3AED]/20 via-[#111111] to-[#111111] px-5 py-4 border-b border-[rgba(39,39,42,0.6)]">
-            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent" />
-            <button onClick={onClose} className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg text-[#71717A] hover:bg-[rgba(255,255,255,0.06)] hover:text-white transition-all">
-              <X size={16} />
+          <div className="relative px-5 py-5 border-b" style={{ borderColor: "rgba(255,255,255,0.06)", background: "linear-gradient(135deg, rgba(124,58,237,0.12) 0%, transparent 60%)" }}>
+            <button
+              onClick={onClose}
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg transition-all"
+              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.07)", color: "#71717A" }}
+            >
+              <X size={14} />
             </button>
-            <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-sm font-bold text-white shadow-lg shadow-purple-900/30">
-                #{rider.no}
+            <div className="flex items-center gap-3.5">
+              <div
+                className="flex h-12 w-12 items-center justify-center rounded-2xl text-[0.8rem] font-black text-white flex-shrink-0"
+                style={{
+                  background: "linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)",
+                  boxShadow: "0 0 20px rgba(139,92,246,0.4), inset 0 1px 0 rgba(255,255,255,0.15)",
+                }}
+              >
+                {rider.no}
               </div>
               <div>
-                <h2 className="text-base font-semibold text-white pr-8">{rider.nama}</h2>
-                <span className={rankBadgeClass(rider.jabatan)}>{rider.jabatan}</span>
+                <h2 className="text-[1rem] font-bold text-white pr-8 leading-tight">{rider.nama}</h2>
+                <div className="mt-1 flex items-center gap-2">
+                  <span className={rankBadgeClass(rider.jabatan)}>{rider.jabatan}</span>
+                  {rider.alamat && (
+                    <span className="text-[0.62rem] text-[#52525B]">· {rider.alamat}</span>
+                  )}
+                </div>
               </div>
             </div>
           </div>
 
           <div className="px-5 py-4 space-y-4">
-            <div className="grid grid-cols-2 gap-2.5">
+            {/* KM hero */}
+            <div
+              className="rounded-2xl p-4 text-center relative overflow-hidden"
+              style={{
+                background: "linear-gradient(135deg, rgba(124,58,237,0.15) 0%, rgba(139,92,246,0.06) 100%)",
+                border: "1px solid rgba(139,92,246,0.22)",
+              }}
+            >
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-px"
+                style={{ background: "linear-gradient(to right, transparent, rgba(168,85,247,0.6), transparent)" }} />
+              <p className="text-[0.58rem] font-semibold uppercase tracking-[0.12em] text-[#8B5CF6] mb-1.5">Total Distance</p>
+              <p className="font-black text-white leading-none" style={{ fontSize: "2.6rem", letterSpacing: "-0.05em", fontVariantNumeric: "tabular-nums" }}>
+                {numFmt(rider.total_km)}
+              </p>
+              <p className="text-[0.78rem] text-[#8B5CF6] font-semibold mt-0.5">kilometers</p>
+            </div>
+
+            {/* Mini stats */}
+            <div className="grid grid-cols-3 gap-2">
               {[
-                { label: "Chapter", value: rider.alamat },
-                { label: "TTL", value: rider.ttl },
-                { label: "Patched", value: rider.bergabung },
-                { label: "Rank", value: rider.jabatan },
-              ].map(({ label, value }) => (
-                <div key={label} className="rounded-xl border border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.02)] p-3">
-                  <p className="text-[0.62rem] font-medium uppercase tracking-widest text-[#71717A]">{label}</p>
-                  <p className="mt-1 text-[0.78rem] text-[#A1A1AA] break-words">{value || "—"}</p>
+                { label: "Runs", value: runs.length, suffix: "" },
+                { label: "Avg / Run", value: avgKm, suffix: " km" },
+                { label: "Best Run", value: topRun, suffix: " km" },
+              ].map(({ label, value, suffix }) => (
+                <div key={label} className="rounded-xl p-3 text-center"
+                  style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <p className="text-[0.58rem] uppercase tracking-widest text-[#52525B] mb-1">{label}</p>
+                  <p className="text-[0.92rem] font-bold text-white" style={{ fontVariantNumeric: "tabular-nums" }}>
+                    {numFmt(value)}{suffix}
+                  </p>
                 </div>
               ))}
             </div>
 
-            <div className="rounded-xl border border-[rgba(139,92,246,0.2)] bg-gradient-to-br from-[rgba(139,92,246,0.1)] to-transparent p-4 text-center">
-              <p className="text-[0.62rem] font-medium uppercase tracking-widest text-[#8B5CF6]">Total Distance</p>
-              <p className="mt-1 text-4xl font-bold text-white">
-                {numFmt(rider.total_km)} <span className="text-xl text-[#8B5CF6]">km</span>
-              </p>
+            {/* Info grid */}
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { label: "Chapter", value: rider.alamat },
+                { label: "Date of Birth", value: rider.ttl },
+                { label: "Patched", value: rider.bergabung },
+                { label: "Rank", value: rider.jabatan },
+              ].map(({ label, value }) => (
+                <div key={label} className="rounded-xl p-3"
+                  style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.055)" }}>
+                  <p className="text-[0.58rem] font-medium uppercase tracking-[0.08em] text-[#3F3F46] mb-0.5">{label}</p>
+                  <p className="text-[0.78rem] text-[#A1A1AA] font-medium break-words">{value || "—"}</p>
+                </div>
+              ))}
             </div>
 
+            {/* Run log */}
             {runs.length > 0 && (
               <div>
-                <p className="mb-2 text-[0.68rem] font-medium uppercase tracking-widest text-[#71717A]">Run Log ({runs.length})</p>
-                <div className="rounded-xl border border-[rgba(39,39,42,0.6)] divide-y divide-[rgba(39,39,42,0.4)]">
+                <p className="mb-2 text-[0.62rem] font-semibold uppercase tracking-[0.1em] text-[#3F3F46]">
+                  Run Log <span className="text-[#52525B]">({runs.length})</span>
+                </p>
+                <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.06)" }}>
                   {runs.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between px-4 py-2.5 hover:bg-[rgba(139,92,246,0.05)] transition-colors">
+                    <div
+                      key={i}
+                      className="flex items-center justify-between px-4 py-2.5 transition-colors"
+                      style={{
+                        borderBottom: i < runs.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                        background: i % 2 === 0 ? "transparent" : "rgba(255,255,255,0.01)",
+                      }}
+                    >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-[0.62rem] font-medium text-[#71717A] flex-shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                        <span className="text-[0.75rem] text-[#A1A1AA] truncate">{r.nama}</span>
+                        <span className="text-[0.58rem] font-bold text-[#3F3F46] flex-shrink-0 w-5 text-right">
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-[0.76rem] text-[#A1A1AA] truncate">{r.nama}</span>
                       </div>
-                      <span className="text-[0.75rem] font-semibold text-[#8B5CF6] flex-shrink-0 ml-2">{numFmt(r.km)} km</span>
+                      <span className="text-[0.76rem] font-semibold text-[#8B5CF6] flex-shrink-0 ml-2 tabular-nums">
+                        {numFmt(r.km)} km
+                      </span>
                     </div>
                   ))}
                 </div>

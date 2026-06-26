@@ -1,4 +1,4 @@
-import { Bell, RefreshCw, Menu } from "lucide-react";
+import { RefreshCw, Menu } from "lucide-react";
 
 interface TopbarProps {
   title: string;
@@ -11,42 +11,52 @@ interface TopbarProps {
 
 export function Topbar({ title, subtitle, onRefresh, loading, actions, onMenuOpen }: TopbarProps) {
   return (
-    <div className="topbar-glass sticky top-0 z-30 flex h-14 md:h-16 items-center justify-between px-4 md:px-6 gap-3">
-      {/* Left: hamburger (mobile) + title */}
+    <div className="topbar-glass sticky top-0 z-30 flex h-14 md:h-[60px] items-center justify-between px-4 md:px-6 gap-3">
+      {/* Left */}
       <div className="flex items-center gap-3 min-w-0">
         {onMenuOpen && (
           <button
             onClick={onMenuOpen}
-            className="md:hidden btn-ghost flex h-9 w-9 items-center justify-center p-0 flex-shrink-0"
+            className="md:hidden btn-ghost flex h-8 w-8 items-center justify-center p-0 flex-shrink-0"
           >
-            <Menu size={18} />
+            <Menu size={16} />
           </button>
         )}
         <div className="min-w-0">
-          <h1 className="text-[0.88rem] md:text-[0.95rem] font-semibold text-white tracking-tight truncate">{title}</h1>
-          {subtitle && <p className="text-[0.65rem] md:text-[0.7rem] text-[#71717A] truncate hidden sm:block">{subtitle}</p>}
+          <h1 className="text-[0.88rem] md:text-[0.92rem] font-semibold text-white tracking-tight truncate leading-none">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="text-[0.62rem] text-[#52525B] truncate hidden sm:block mt-0.5 tracking-wide">
+              {subtitle}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Right: actions */}
+      {/* Right */}
       <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Actions slot — hidden on very small screens if needed */}
-        <div className="flex items-center gap-2">
-          {actions}
-        </div>
+        {actions}
         {onRefresh && (
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="btn-ghost flex h-9 w-9 items-center justify-center p-0 disabled:opacity-40"
+            className="btn-ghost flex h-8 w-8 items-center justify-center p-0 disabled:opacity-30"
           >
-            <RefreshCw size={15} className={loading ? "animate-spin text-[#8B5CF6]" : ""} />
+            <RefreshCw
+              size={13}
+              className={loading ? "animate-spin text-[#8B5CF6]" : "text-[#71717A]"}
+            />
           </button>
         )}
-        <button className="btn-ghost hidden sm:flex h-9 w-9 items-center justify-center p-0">
-          <Bell size={15} />
-        </button>
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-[#7C3AED] to-[#A855F7] text-xs font-semibold text-white flex-shrink-0">
+        {/* Avatar */}
+        <div
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[0.65rem] font-bold text-white flex-shrink-0"
+          style={{
+            background: "linear-gradient(135deg, #7C3AED 0%, #A855F7 100%)",
+            boxShadow: "0 0 12px rgba(139,92,246,0.35)",
+          }}
+        >
           A
         </div>
       </div>

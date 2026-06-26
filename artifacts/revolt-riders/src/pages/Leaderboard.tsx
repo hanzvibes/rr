@@ -100,15 +100,19 @@ function PositionIcon({ rank }: { rank: number }) {
 /* ── Progress bar ─────────────────────────────────────────────── */
 function KmBar({ value, max, rank }: { value: number; max: number; rank: number }) {
   const pct = max > 0 ? (value / max) * 100 : 0;
-  const color = rank === 1 ? "#F59E0B" : rank === 2 ? "#94A3B8" : rank === 3 ? "#B45309" : "#8B5CF6";
+  const gradient =
+    rank === 1 ? "linear-gradient(90deg, #D97706, #F59E0B, #FDE68A)"
+    : rank === 2 ? "linear-gradient(90deg, #64748B, #94A3B8)"
+    : rank === 3 ? "linear-gradient(90deg, #92400E, #B45309)"
+    : "linear-gradient(90deg, #6D28D9, #8B5CF6, #A855F7)";
   return (
-    <div className="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(255,255,255,0.05)]">
+    <div className="h-1 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.05)" }}>
       <motion.div
         initial={{ width: 0 }}
         animate={{ width: `${pct}%` }}
-        transition={{ duration: 0.45, delay: 0.05, ease: [0.4, 0, 0.2, 1] }}
+        transition={{ duration: 0.5, delay: 0.06, ease: [0.4, 0, 0.2, 1] }}
         className="h-full rounded-full"
-        style={{ background: color }}
+        style={{ background: gradient, boxShadow: rank <= 3 ? `0 0 6px ${rank === 1 ? "rgba(245,158,11,0.4)" : rank === 2 ? "rgba(148,163,184,0.3)" : "rgba(180,83,9,0.3)"}` : "none" }}
       />
     </div>
   );

@@ -19,9 +19,9 @@ function Layout() {
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-[#0A0A0A]">
-      <div className="ambient-glow" style={{ width: 600, height: 600, background: "#7C3AED", top: -200, left: -200 }} />
-      <div className="ambient-glow" style={{ width: 400, height: 400, background: "#A855F7", bottom: -100, right: -100 }} />
+    <div className="flex min-h-screen bg-[#080808]">
+      <div className="ambient-glow" style={{ width: 700, height: 700, background: "radial-gradient(circle, #7C3AED 0%, transparent 70%)", top: -280, left: -280 }} />
+      <div className="ambient-glow" style={{ width: 500, height: 500, background: "radial-gradient(circle, #6D28D9 0%, transparent 70%)", bottom: -200, right: -200, opacity: 0.03 }} />
 
       {mobileOpen && (
         <div
