@@ -1,6 +1,6 @@
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gauge, ChevronLeft, ChevronRight, KeyRound, Medal, Route, X, Swords, Flame, Trophy, CreditCard, Megaphone } from "lucide-react";
+import { Gauge, ChevronLeft, ChevronRight, KeyRound, Medal, Route, X, Swords, Flame, Trophy, CreditCard, Megaphone, Dna } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Showdown", icon: Swords, href: "/showdown" },
   { label: "Trophies", icon: Trophy, href: "/trophies" },
   { label: "Report Card", icon: CreditCard, href: "/report-card" },
+  { label: "Club DNA", icon: Dna, href: "/dna" },
   { label: "Announcements", icon: Megaphone, href: "/announcements" },
   { label: "Admin Panel", icon: KeyRound, href: "/admin" },
 ];
