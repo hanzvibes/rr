@@ -463,61 +463,65 @@ function AnnouncementsPanel() {
                     : "border-white/6"
                 )}
               >
-                <div className="p-4 flex gap-3">
-                  <div className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1.5", cfg.dot)} />
-                  <div className="flex-1 min-w-0">
-                    {/* Top row */}
-                    <div className="flex items-start justify-between gap-2 mb-1.5">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        {ann.pinned && <Pin size={9} className="text-amber-400 flex-shrink-0" />}
-                        <span className={cn("text-[0.58rem] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border", cfg.badge)}>
-                          <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
-                        </span>
-                      </div>
-                      {/* Action buttons */}
-                      <div className="flex items-center gap-0.5 flex-shrink-0">
-                        <button
-                          onClick={() => isActiveEdit ? resetForm() : startEdit(ann)}
-                          title={isActiveEdit ? "Cancel edit" : "Edit"}
-                          className={cn(
-                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
-                            isActiveEdit
-                              ? "text-purple-400 bg-purple-500/15"
-                              : "text-[#52525B] hover:text-purple-400 hover:bg-purple-500/10"
-                          )}
-                        >
-                          {isActiveEdit ? <X size={11} /> : <Pencil size={11} />}
-                        </button>
-                        <button
-                          onClick={() => togglePin(ann.id)}
-                          title={ann.pinned ? "Unpin" : "Pin"}
-                          className={cn(
-                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
-                            ann.pinned ? "text-amber-400 bg-amber-500/10" : "text-[#52525B] hover:text-amber-400 hover:bg-amber-500/10"
-                          )}
-                        >
-                          <Pin size={11} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteConfirmId(isConfirmingDelete ? null : ann.id)}
-                          title="Delete"
-                          className={cn(
-                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
-                            isConfirmingDelete
-                              ? "text-red-400 bg-red-500/15"
-                              : "text-[#52525B] hover:text-red-400 hover:bg-red-500/10"
-                          )}
-                        >
-                          <Trash2 size={11} />
-                        </button>
-                      </div>
-                    </div>
+                <div className="p-4">
+                  {/* Badge row */}
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className={cn("h-2 w-2 rounded-full flex-shrink-0", cfg.dot)} />
+                    <span className={cn("text-[0.6rem] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border", cfg.badge)}>
+                      <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
+                    </span>
+                    {ann.pinned && (
+                      <span className="flex items-center gap-1 text-[0.6rem] text-amber-400 font-medium">
+                        <Pin size={9} /> Pinned
+                      </span>
+                    )}
+                  </div>
 
-                    <p className="text-[0.83rem] font-semibold text-white mb-0.5">{ann.title}</p>
-                    <p className="text-[0.72rem] text-[#71717A] leading-relaxed line-clamp-2">{ann.body}</p>
-                    <p className="text-[0.58rem] text-[#3F3F46] mt-2">
-                      {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                    </p>
+                  <p className="text-[0.85rem] font-semibold text-white mb-1">{ann.title}</p>
+                  <p className="text-[0.73rem] text-[#A1A1AA] leading-relaxed line-clamp-2">{ann.body}</p>
+                  <p className="text-[0.62rem] text-[#52525B] mt-2">
+                    {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </p>
+
+                  {/* Action buttons — always visible */}
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
+                    <button
+                      onClick={() => isActiveEdit ? resetForm() : startEdit(ann)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all",
+                        isActiveEdit
+                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                          : "bg-white/5 text-[#C4C4C4] hover:bg-purple-500/15 hover:text-purple-300 border border-white/8"
+                      )}
+                    >
+                      {isActiveEdit ? <><X size={11} /> Cancel Edit</> : <><Pencil size={11} /> Edit</>}
+                    </button>
+
+                    <button
+                      onClick={() => togglePin(ann.id)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all border",
+                        ann.pinned
+                          ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
+                          : "bg-white/5 text-[#C4C4C4] hover:bg-amber-500/10 hover:text-amber-300 border-white/8"
+                      )}
+                    >
+                      <Pin size={11} />
+                      {ann.pinned ? "Unpin" : "Pin"}
+                    </button>
+
+                    <button
+                      onClick={() => setDeleteConfirmId(isConfirmingDelete ? null : ann.id)}
+                      className={cn(
+                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all border ml-auto",
+                        isConfirmingDelete
+                          ? "bg-red-500/20 text-red-300 border-red-500/30"
+                          : "bg-white/5 text-[#C4C4C4] hover:bg-red-500/10 hover:text-red-400 border-white/8"
+                      )}
+                    >
+                      <Trash2 size={11} />
+                      Delete
+                    </button>
                   </div>
                 </div>
 
