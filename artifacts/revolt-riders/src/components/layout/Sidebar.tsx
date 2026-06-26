@@ -1,6 +1,6 @@
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gauge, ChevronLeft, ChevronRight, KeyRound, Medal, Route, X, Swords, Flame } from "lucide-react";
+import { Gauge, ChevronLeft, ChevronRight, KeyRound, Medal, Route, X, Swords, Flame, Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { label: "Leaderboard", icon: Medal, href: "/leaderboard" },
   { label: "Run History", icon: Route, href: "/runs" },
   { label: "Showdown", icon: Swords, href: "/showdown" },
+  { label: "Trophies", icon: Trophy, href: "/trophies" },
   { label: "Admin Panel", icon: KeyRound, href: "/admin" },
 ];
 

@@ -7,6 +7,7 @@ import Admin from "@/pages/Admin";
 import Leaderboard from "@/pages/Leaderboard";
 import RunHistory from "@/pages/RunHistory";
 import Showdown from "@/pages/Showdown";
+import Trophies from "@/pages/Trophies";
 import NotFound from "@/pages/not-found";
 
 function Layout() {
