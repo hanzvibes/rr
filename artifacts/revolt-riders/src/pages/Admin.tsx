@@ -269,7 +269,6 @@ const TYPE_COLORS = {
 
 function AnnouncementsPanel() {
   const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement, togglePin } = useAnnouncements();
-
   const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -277,288 +276,211 @@ function AnnouncementsPanel() {
   const [pinned, setPinned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-
+  const [mobileTab, setMobileTab] = useState<"list" | "compose">("list");
   const isEditing = editingId !== null;
 
   function resetForm() {
-    setEditingId(null);
-    setTitle(""); setBody(""); setType("info"); setPinned(false);
+    setEditingId(null); setTitle(""); setBody(""); setType("info"); setPinned(false);
   }
-
   function startEdit(ann: Announcement) {
-    setEditingId(ann.id);
-    setTitle(ann.title);
-    setBody(ann.body);
-    setType(ann.type);
-    setPinned(ann.pinned);
+    setEditingId(ann.id); setTitle(ann.title); setBody(ann.body); setType(ann.type); setPinned(ann.pinned);
+    setMobileTab("compose");
   }
-
   function handleSubmit() {
-    if (!title.trim() || !body.trim()) {
-      toast.error("Title and body are required.");
-      return;
-    }
+    if (!title.trim() || !body.trim()) { toast.error("Title and body are required."); return; }
     setSubmitting(true);
-    if (isEditing) {
-      updateAnnouncement(editingId!, { title: title.trim(), body: body.trim(), type, pinned });
-      toast.success("Announcement updated!");
-    } else {
-      addAnnouncement({ title: title.trim(), body: body.trim(), type, pinned });
-      toast.success("Announcement posted!");
-    }
-    resetForm();
-    setSubmitting(false);
+    if (isEditing) { updateAnnouncement(editingId!, { title: title.trim(), body: body.trim(), type, pinned }); toast.success("Updated!"); }
+    else { addAnnouncement({ title: title.trim(), body: body.trim(), type, pinned }); toast.success("Posted!"); }
+    resetForm(); setMobileTab("list"); setSubmitting(false);
   }
-
   function handleDelete(id: string) {
-    deleteAnnouncement(id);
-    toast.success("Deleted.");
-    setDeleteConfirmId(null);
+    deleteAnnouncement(id); toast.success("Deleted."); setDeleteConfirmId(null);
     if (editingId === id) resetForm();
   }
 
-  return (
-    <div className="flex flex-1 overflow-hidden">
-      {/* Left — Compose / Edit panel */}
-      <div className="w-full md:w-80 flex-shrink-0 border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] flex flex-col overflow-hidden">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={editingId ?? "new"}
-            initial={{ opacity: 0, x: -8 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -8 }}
-            transition={{ duration: 0.15 }}
-            className="flex-1 overflow-y-auto p-4 space-y-3"
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between">
-              <p className="text-[0.72rem] font-semibold uppercase tracking-wider text-[#71717A]">
-                {isEditing ? "Edit Announcement" : "New Announcement"}
-              </p>
-              {isEditing && (
-                <button
-                  onClick={resetForm}
-                  className="h-6 w-6 rounded-lg flex items-center justify-center text-[#52525B] hover:text-white transition-colors"
-                >
-                  <X size={13} />
-                </button>
-              )}
-            </div>
-
-            {isEditing && (
-              <div className="rounded-lg px-3 py-2 text-[0.68rem] text-purple-300 flex items-center gap-2"
-                style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
-                <Pencil size={10} />
-                Editing existing announcement
-              </div>
-            )}
-
-            <div>
-              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Title</label>
-              <input
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="Announcement title..."
-                className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
-              />
-            </div>
-
-            <div>
-              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Message</label>
-              <textarea
-                value={body}
-                onChange={e => setBody(e.target.value)}
-                placeholder="Write your announcement here..."
-                rows={4}
-                className="input-dark w-full resize-y px-3 py-2.5 text-[0.82rem] font-[inherit]"
-              />
-            </div>
-
-            <div>
-              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-2 block">Type</label>
-              <div className="grid grid-cols-3 gap-1.5">
-                {(["info", "event", "urgent"] as AnnouncementType[]).map(t => {
-                  const Icon = TYPE_ICONS[t];
-                  return (
-                    <button
-                      key={t}
-                      onClick={() => setType(t)}
-                      className={cn(
-                        "flex flex-col items-center gap-1 py-2 rounded-xl border text-[0.65rem] font-medium transition-all",
-                        type === t
-                          ? TYPE_COLORS[t].badge + " border-current"
-                          : "border-white/5 text-[#52525B] hover:text-white hover:border-white/10"
-                      )}
-                    >
-                      <Icon size={13} />
-                      {TYPE_LABELS[t]}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <label className="flex items-center gap-2 cursor-pointer">
-              <div
-                onClick={() => setPinned(p => !p)}
-                className={cn(
-                  "h-4 w-4 rounded flex items-center justify-center transition-all border",
-                  pinned ? "bg-amber-500 border-amber-400" : "border-white/15 bg-white/5"
-                )}
-              >
-                {pinned && <Pin size={9} className="text-white" />}
-              </div>
-              <span className="text-[0.75rem] text-[#A1A1AA]">Pin to top</span>
-            </label>
-
-            <div className="flex gap-2 pt-1">
-              <button
-                onClick={handleSubmit}
-                disabled={submitting || !title.trim() || !body.trim()}
-                className="btn-purple flex-1 flex items-center justify-center gap-2 py-2.5 text-[0.82rem] font-medium disabled:opacity-40"
-              >
-                {isEditing ? <><CheckCircle2 size={13} /> Save Changes</> : <><Send size={13} /> Post</>}
-              </button>
-              {isEditing && (
-                <button
-                  onClick={resetForm}
-                  className="btn-ghost px-4 py-2.5 text-[0.82rem] text-[#71717A]"
-                >
-                  Cancel
-                </button>
-              )}
-            </div>
-          </motion.div>
-        </AnimatePresence>
+  const ComposePanel = (
+    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-[0.72rem] font-semibold uppercase tracking-wider text-[#71717A]">
+          {isEditing ? "Edit Announcement" : "New Announcement"}
+        </p>
+        {isEditing && (
+          <button onClick={resetForm} className="h-6 w-6 rounded-lg flex items-center justify-center text-[#52525B] hover:text-white">
+            <X size={13} />
+          </button>
+        )}
       </div>
+      {isEditing && (
+        <div className="rounded-lg px-3 py-2 text-[0.68rem] text-purple-300 flex items-center gap-2"
+          style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+          <Pencil size={10} /> Editing existing announcement
+        </div>
+      )}
+      <div>
+        <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Title</label>
+        <input value={title} onChange={e => setTitle(e.target.value)} placeholder="Announcement title..."
+          className="input-dark w-full px-3 py-2.5 text-[0.82rem]" />
+      </div>
+      <div>
+        <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Message</label>
+        <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Write your announcement here..."
+          rows={4} className="input-dark w-full resize-y px-3 py-2.5 text-[0.82rem] font-[inherit]" />
+      </div>
+      <div>
+        <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-2 block">Type</label>
+        <div className="grid grid-cols-3 gap-1.5">
+          {(["info", "event", "urgent"] as AnnouncementType[]).map(t => {
+            const TIcon = TYPE_ICONS[t];
+            return (
+              <button key={t} onClick={() => setType(t)}
+                className={cn("flex flex-col items-center gap-1 py-2 rounded-xl border text-[0.65rem] font-medium transition-all",
+                  type === t ? TYPE_COLORS[t].badge + " border-current" : "border-white/5 text-[#52525B] hover:text-white hover:border-white/10")}>
+                <TIcon size={13} />{TYPE_LABELS[t]}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <div onClick={() => setPinned(p => !p)}
+          className={cn("h-4 w-4 rounded flex items-center justify-center transition-all border",
+            pinned ? "bg-amber-500 border-amber-400" : "border-white/15 bg-white/5")}>
+          {pinned && <Pin size={9} className="text-white" />}
+        </div>
+        <span className="text-[0.75rem] text-[#A1A1AA]">Pin to top</span>
+      </label>
+      <div className="flex gap-2 pt-1">
+        <button onClick={handleSubmit} disabled={submitting || !title.trim() || !body.trim()}
+          className="btn-purple flex-1 flex items-center justify-center gap-2 py-2.5 text-[0.82rem] font-medium disabled:opacity-40">
+          {isEditing ? "Save Changes" : "Post"}
+        </button>
+        {isEditing && (
+          <button onClick={resetForm} className="btn-ghost px-4 py-2.5 text-[0.82rem] text-[#71717A]">
+            Cancel
+          </button>
+        )}
+      </div>
+    </div>
+  );
 
-      {/* Right — List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-[#52525B] mb-3">
+  const ListPanel = (
+    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-[#52525B]">
           {announcements.length} announcement{announcements.length !== 1 ? "s" : ""}
         </p>
-
-        {announcements.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3">
-            <Megaphone size={28} className="text-[#3F3F46]" />
-            <p className="text-[0.78rem] text-[#52525B]">No announcements posted yet.</p>
-          </div>
-        ) : (
-          announcements.map(ann => {
-            const cfg = TYPE_COLORS[ann.type];
-            const Icon = TYPE_ICONS[ann.type];
-            const isActiveEdit = editingId === ann.id;
-            const isConfirmingDelete = deleteConfirmId === ann.id;
-
-            return (
-              <motion.div
-                key={ann.id}
-                layout
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={cn(
-                  "rounded-xl border bg-[#0C0C0C] overflow-hidden transition-all",
-                  isActiveEdit
-                    ? "border-purple-500/40 ring-1 ring-purple-500/20"
-                    : "border-white/6"
-                )}
-              >
-                <div className="p-4">
-                  {/* Badge row */}
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={cn("h-2 w-2 rounded-full flex-shrink-0", cfg.dot)} />
-                    <span className={cn("text-[0.6rem] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border", cfg.badge)}>
-                      <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
+        <button onClick={() => setMobileTab("compose")}
+          className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium bg-purple-600 text-white">
+          <Send size={11} /> New Post
+        </button>
+      </div>
+      {announcements.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16 gap-3">
+          <Megaphone size={28} className="text-[#3F3F46]" />
+          <p className="text-[0.78rem] text-[#52525B]">No announcements yet. Create one!</p>
+        </div>
+      ) : (
+        announcements.map(ann => {
+          const cfg = TYPE_COLORS[ann.type];
+          const AIcon = TYPE_ICONS[ann.type];
+          const isActiveEdit = editingId === ann.id;
+          const isConfirmingDelete = deleteConfirmId === ann.id;
+          return (
+            <motion.div key={ann.id} layout initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+              className={cn("rounded-xl border bg-[#111] overflow-hidden",
+                isActiveEdit ? "border-purple-500/50" : "border-white/8")}>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className={cn("h-2 w-2 rounded-full flex-shrink-0", cfg.dot)} />
+                  <span className={cn("text-[0.6rem] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full border", cfg.badge)}>
+                    <AIcon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
+                  </span>
+                  {ann.pinned && (
+                    <span className="text-[0.6rem] text-amber-400 font-medium flex items-center gap-1">
+                      <Pin size={9} /> Pinned
                     </span>
-                    {ann.pinned && (
-                      <span className="flex items-center gap-1 text-[0.6rem] text-amber-400 font-medium">
-                        <Pin size={9} /> Pinned
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-[0.85rem] font-semibold text-white mb-1">{ann.title}</p>
-                  <p className="text-[0.73rem] text-[#A1A1AA] leading-relaxed line-clamp-2">{ann.body}</p>
-                  <p className="text-[0.62rem] text-[#52525B] mt-2">
-                    {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </p>
-
-                  {/* Action buttons — always visible */}
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/5">
-                    <button
-                      onClick={() => isActiveEdit ? resetForm() : startEdit(ann)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all",
-                        isActiveEdit
-                          ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                          : "bg-white/5 text-[#C4C4C4] hover:bg-purple-500/15 hover:text-purple-300 border border-white/8"
-                      )}
-                    >
-                      {isActiveEdit ? <><X size={11} /> Cancel Edit</> : <><Pencil size={11} /> Edit</>}
+                  )}
+                </div>
+                <p className="text-[0.85rem] font-semibold text-white mb-0.5">{ann.title}</p>
+                <p className="text-[0.73rem] text-[#A1A1AA] leading-relaxed line-clamp-2">{ann.body}</p>
+                <p className="text-[0.6rem] text-[#52525B] mt-2">
+                  {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                </p>
+                {/* Action buttons */}
+                <div className="flex items-center gap-2 mt-3 pt-3 border-t border-white/6 flex-wrap">
+                  <button onClick={() => (isActiveEdit ? resetForm() : startEdit(ann))}
+                    className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-[0.75rem] font-semibold border transition-all",
+                      isActiveEdit ? "bg-purple-500/20 text-purple-200 border-purple-500/40" : "bg-[#1C1C1C] text-white border-white/12 hover:bg-purple-500/15 hover:border-purple-500/40")}>
+                    <Pencil size={12} />{isActiveEdit ? "Cancel Edit" : "Edit"}
+                  </button>
+                  <button onClick={() => togglePin(ann.id)}
+                    className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-[0.75rem] font-semibold border transition-all",
+                      ann.pinned ? "bg-amber-500/15 text-amber-200 border-amber-500/40" : "bg-[#1C1C1C] text-white border-white/12 hover:bg-amber-500/10 hover:border-amber-500/30")}>
+                    <Pin size={12} />{ann.pinned ? "Unpin" : "Pin"}
+                  </button>
+                  <button onClick={() => setDeleteConfirmId(isConfirmingDelete ? null : ann.id)}
+                    className={cn("flex items-center gap-1.5 px-3 py-2 rounded-lg text-[0.75rem] font-semibold border transition-all ml-auto",
+                      isConfirmingDelete ? "bg-red-500/20 text-red-200 border-red-500/40" : "bg-[#1C1C1C] text-white border-white/12 hover:bg-red-500/10 hover:border-red-500/30")}>
+                    <Trash2 size={12} />Delete
+                  </button>
+                </div>
+              </div>
+              {isConfirmingDelete && (
+                <div className="border-t border-red-500/20 px-4 py-3 bg-red-950/30 flex items-center justify-between gap-3">
+                  <p className="text-[0.73rem] text-red-300">Delete this announcement?</p>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleDelete(ann.id)}
+                      className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-[0.72rem] font-semibold hover:bg-red-500">
+                      Yes, Delete
                     </button>
-
-                    <button
-                      onClick={() => togglePin(ann.id)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all border",
-                        ann.pinned
-                          ? "bg-amber-500/15 text-amber-300 border-amber-500/30"
-                          : "bg-white/5 text-[#C4C4C4] hover:bg-amber-500/10 hover:text-amber-300 border-white/8"
-                      )}
-                    >
-                      <Pin size={11} />
-                      {ann.pinned ? "Unpin" : "Pin"}
-                    </button>
-
-                    <button
-                      onClick={() => setDeleteConfirmId(isConfirmingDelete ? null : ann.id)}
-                      className={cn(
-                        "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[0.72rem] font-medium transition-all border ml-auto",
-                        isConfirmingDelete
-                          ? "bg-red-500/20 text-red-300 border-red-500/30"
-                          : "bg-white/5 text-[#C4C4C4] hover:bg-red-500/10 hover:text-red-400 border-white/8"
-                      )}
-                    >
-                      <Trash2 size={11} />
-                      Delete
+                    <button onClick={() => setDeleteConfirmId(null)}
+                      className="px-3 py-1.5 rounded-lg bg-white/8 text-[#A1A1AA] text-[0.72rem] hover:bg-white/12">
+                      Cancel
                     </button>
                   </div>
                 </div>
+              )}
+            </motion.div>
+          );
+        })
+      )}
+    </div>
+  );
 
-                {/* Delete confirm inline */}
-                <AnimatePresence>
-                  {isConfirmingDelete && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: "auto", opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="overflow-hidden border-t border-red-500/20"
-                    >
-                      <div className="flex items-center justify-between px-4 py-2.5 bg-red-500/5">
-                        <p className="text-[0.72rem] text-red-400">Delete this announcement?</p>
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleDelete(ann.id)}
-                            className="rounded-lg bg-red-600 px-3 py-1.5 text-[0.7rem] font-medium text-white hover:bg-red-500 transition-colors"
-                          >
-                            Delete
-                          </button>
-                          <button
-                            onClick={() => setDeleteConfirmId(null)}
-                            className="btn-ghost rounded-lg px-3 py-1.5 text-[0.7rem] text-[#71717A]"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })
-        )}
+  return (
+    <div className="flex flex-col flex-1 overflow-hidden">
+      {/* Mobile tab switcher */}
+      <div className="flex md:hidden flex-shrink-0 border-b border-white/8">
+        <button onClick={() => setMobileTab("list")}
+          className={cn("flex-1 py-3 text-[0.8rem] font-semibold flex items-center justify-center gap-2 border-b-2 transition-all",
+            mobileTab === "list" ? "text-white border-purple-500" : "text-[#52525B] border-transparent")}>
+          <Megaphone size={14} /> List ({announcements.length})
+        </button>
+        <button onClick={() => setMobileTab("compose")}
+          className={cn("flex-1 py-3 text-[0.8rem] font-semibold flex items-center justify-center gap-2 border-b-2 transition-all",
+            mobileTab === "compose" ? "text-white border-purple-500" : "text-[#52525B] border-transparent")}>
+          <Send size={14} /> {isEditing ? "Edit" : "New Post"}
+        </button>
+      </div>
+
+      {/* Body: side-by-side on desktop, tab-switched on mobile */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Compose — left on desktop, tab on mobile */}
+        <div className={cn(
+          "flex-shrink-0 border-r border-white/6 bg-[#0D0D0D] flex flex-col overflow-hidden",
+          "md:w-80 md:flex",
+          mobileTab === "compose" ? "flex w-full" : "hidden md:flex"
+        )}>
+          {ComposePanel}
+        </div>
+        {/* List — right on desktop, tab on mobile */}
+        <div className={cn(
+          "flex-1 overflow-hidden flex flex-col",
+          "md:flex",
+          mobileTab === "list" ? "flex" : "hidden md:flex"
+        )}>
+          {ListPanel}
+        </div>
       </div>
     </div>
   );
