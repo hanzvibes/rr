@@ -6,6 +6,7 @@ import Dashboard from "@/pages/Dashboard";
 import Admin from "@/pages/Admin";
 import Leaderboard from "@/pages/Leaderboard";
 import RunHistory from "@/pages/RunHistory";
+import Showdown from "@/pages/Showdown";
 import NotFound from "@/pages/not-found";
 
 function Layout() {
@@ -42,6 +43,7 @@ function Layout() {
           <Route path="/" component={() => <Dashboard onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/leaderboard" component={() => <Leaderboard onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/runs" component={() => <RunHistory onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/showdown" component={() => <Showdown onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>

@@ -1,12 +1,13 @@
 import { useLocation, Link } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, Trophy, Bike, X } from "lucide-react";
+import { LayoutDashboard, ChevronLeft, ChevronRight, Shield, Trophy, Bike, X, Swords } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, href: "/" },
   { label: "Leaderboard", icon: Trophy, href: "/leaderboard" },
   { label: "Run History", icon: Bike, href: "/runs" },
+  { label: "Showdown", icon: Swords, href: "/showdown" },
   { label: "Admin Panel", icon: Shield, href: "/admin" },
 ];
 
