@@ -1,0 +1,9 @@
+{
+  "buildCommand": "cd ../.. && pnpm --filter @workspace/revolt-riders run build",
+  "outputDirectory": "dist",
+  "installCommand": "cd ../.. && pnpm install",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
