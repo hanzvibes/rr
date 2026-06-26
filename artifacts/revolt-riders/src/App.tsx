@@ -46,6 +46,7 @@ function Layout() {
           <Route path="/runs" component={() => <RunHistory onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/showdown" component={() => <Showdown onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/trophies" component={() => <Trophies onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>
       </div>

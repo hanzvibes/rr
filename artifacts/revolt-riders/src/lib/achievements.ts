@@ -163,12 +163,12 @@ export function computeBadges(rider: Rider): Badge[] {
     let earns = false;
     switch (badge.id) {
       case "legend":      earns = km >= 2000; break;
-      case "road_warrior":earns = km >= 1500 && km < 2000; break;
-      case "velocity":    earns = km >= 1000 && km < 1500; break;
-      case "iron":        earns = km >= 500  && km < 1000; break;
+      case "road_warrior":earns = km >= 1500; break;
+      case "velocity":    earns = km >= 1000; break;
+      case "iron":        earns = km >= 500; break;
       case "explorer":    earns = runCount >= 20; break;
-      case "adventurer":  earns = runCount >= 10 && runCount < 20; break;
-      case "scout":       earns = runCount >= 5  && runCount < 10; break;
+      case "adventurer":  earns = runCount >= 10; break;
+      case "scout":       earns = runCount >= 5; break;
       case "royalty":     earns = jabatan === "FOUNDER"; break;
       case "commander":   earns = ["PRESIDENT", "EXCECUTOR", "NEGOSIATOR"].includes(jabatan); break;
       case "life_member": earns = jabatan === "LIFE MEMBER"; break;
