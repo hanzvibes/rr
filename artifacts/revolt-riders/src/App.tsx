@@ -8,6 +8,8 @@ import Leaderboard from "@/pages/Leaderboard";
 import RunHistory from "@/pages/RunHistory";
 import Showdown from "@/pages/Showdown";
 import Trophies from "@/pages/Trophies";
+import ReportCard from "@/pages/ReportCard";
+import Announcements from "@/pages/Announcements";
 import NotFound from "@/pages/not-found";
 
 function Layout() {
@@ -47,6 +49,8 @@ function Layout() {
           <Route path="/showdown" component={() => <Showdown onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/admin" component={() => <Admin onMenuOpen={() => setMobileOpen(true)} />} />
           <Route path="/trophies" component={() => <Trophies onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/report-card" component={() => <ReportCard onMenuOpen={() => setMobileOpen(true)} />} />
+          <Route path="/announcements" component={() => <Announcements onMenuOpen={() => setMobileOpen(true)} />} />
           <Route component={NotFound} />
         </Switch>
       </div>

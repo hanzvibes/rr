@@ -4,7 +4,10 @@ import {
   Users2, Navigation2, Activity, Flame, Timer, Gem,
   Search, ArrowDownToLine, ChevronUp, ChevronDown, X,
   ChevronRight, SlidersHorizontal, LayoutGrid, Rows3,
+  Megaphone, AlertTriangle, Info, PartyPopper, Pin, ArrowRight,
 } from "lucide-react";
+import { Link } from "wouter";
+import { useAnnouncements } from "@/lib/announcements";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, BarChart, Bar, Cell,
@@ -455,6 +458,43 @@ function RiderModal({ rider, onClose }: { rider: Rider; onClose: () => void }) {
   );
 }
 
+/* ── Announcement Banner ─────────────────────────────────────── */
+const ANN_TYPE_CONFIG = {
+  info: { icon: Info, color: "text-blue-400", bg: "rgba(59,130,246,0.08)", border: "rgba(59,130,246,0.2)" },
+  event: { icon: PartyPopper, color: "text-purple-400", bg: "rgba(168,85,247,0.08)", border: "rgba(168,85,247,0.2)" },
+  urgent: { icon: AlertTriangle, color: "text-red-400", bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.2)" },
+};
+
+function AnnouncementBanner() {
+  const { announcements } = useAnnouncements();
+  const latest = announcements[0];
+  if (!latest) return null;
+  const cfg = ANN_TYPE_CONFIG[latest.type];
+  const Icon = cfg.icon;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="mb-5 rounded-2xl flex items-center gap-3 px-4 py-3 cursor-default"
+      style={{ background: cfg.bg, border: `1px solid ${cfg.border}` }}
+    >
+      <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg" style={{ background: cfg.bg }}>
+        <Icon size={13} className={cfg.color} />
+      </div>
+      {latest.pinned && <Pin size={10} className="text-amber-400 flex-shrink-0" />}
+      <div className="flex-1 min-w-0">
+        <span className="text-[0.78rem] font-semibold text-white">{latest.title}</span>
+        <span className="text-[0.73rem] text-[#71717A] ml-2 line-clamp-1">{latest.body}</span>
+      </div>
+      <Link href="/announcements">
+        <a className={`flex items-center gap-1 text-[0.68rem] font-medium flex-shrink-0 transition-opacity hover:opacity-70 ${cfg.color}`}>
+          View all <ArrowRight size={11} />
+        </a>
+      </Link>
+    </motion.div>
+  );
+}
+
 /* ── Skeleton ──────────────────────────────────────────────────── */
 function SkeletonCard() {
   return (
@@ -632,6 +672,9 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
             </>
           ) : null}
         </div>
+
+        {/* Announcement Banner */}
+        <AnnouncementBanner />
 
         {/* Charts — stack on mobile */}
         <div className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-3">

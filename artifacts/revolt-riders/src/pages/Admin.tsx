@@ -1,11 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, LogOut, CirclePlus, RotateCcw, CheckCircle2, Trash2, X, Search, ChevronLeft } from "lucide-react";
+import {
+  Eye, EyeOff, LogOut, CirclePlus, RotateCcw, CheckCircle2, Trash2, X,
+  Search, ChevronLeft, Megaphone, Users, Pin, AlertTriangle, Info, PartyPopper, Send
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { numFmt, calcTotalKm, cn } from "@/lib/utils";
 import type { Rider } from "@/lib/types";
 import { Topbar } from "@/components/layout/Topbar";
+import { useAnnouncements, type AnnouncementType } from "@/lib/announcements";
 
 const JABATAN_LIST = ["FOUNDER", "PRESIDENT", "EXCECUTOR", "NEGOSIATOR", "LIFE MEMBER", "VIRGIN", "CAPROS", "PROSPEK"];
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "revolt2026";
@@ -140,7 +144,6 @@ function EditorPanel({
         exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.2 }} className="mx-auto max-w-xl">
 
         <div className="mb-5 flex items-center gap-3">
-          {/* Back button — visible always on mobile for UX clarity */}
           <button onClick={onCancel}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.03)] text-[#71717A] hover:text-white transition-colors md:hidden">
             <ChevronLeft size={16} />
@@ -206,7 +209,6 @@ function EditorPanel({
             <p className="text-3xl font-bold text-white">{numFmt(totalKm)} <span className="text-lg font-medium text-[#8B5CF6]">km</span></p>
           </div>
 
-          {/* Action buttons */}
           <div className="flex items-center gap-3 pt-1 pb-6">
             <button onClick={onSave} disabled={saving}
               className="btn-purple flex flex-1 items-center justify-center gap-2 py-3 text-[0.82rem] font-medium disabled:opacity-50">
@@ -226,7 +228,6 @@ function EditorPanel({
         </div>
       </motion.div>
 
-      {/* Delete confirm */}
       <AnimatePresence>
         {showConfirm && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -257,6 +258,175 @@ function EditorPanel({
   );
 }
 
+/* ── Announcements Panel ─────────────────────────────────────── */
+const TYPE_ICONS = { info: Info, event: PartyPopper, urgent: AlertTriangle };
+const TYPE_LABELS = { info: "Info", event: "Event", urgent: "Urgent" };
+const TYPE_COLORS = {
+  info: { badge: "bg-blue-900/40 text-blue-300 border-blue-700/40", dot: "bg-blue-400" },
+  event: { badge: "bg-purple-900/40 text-purple-300 border-purple-700/40", dot: "bg-purple-400" },
+  urgent: { badge: "bg-red-900/40 text-red-300 border-red-700/40", dot: "bg-red-400" },
+};
+
+function AnnouncementsPanel() {
+  const { announcements, addAnnouncement, deleteAnnouncement, togglePin } = useAnnouncements();
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
+  const [type, setType] = useState<AnnouncementType>("info");
+  const [pinned, setPinned] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  function handlePost() {
+    if (!title.trim() || !body.trim()) {
+      toast.error("Title and body are required.");
+      return;
+    }
+    setSubmitting(true);
+    addAnnouncement({ title: title.trim(), body: body.trim(), type, pinned });
+    toast.success("Announcement posted!");
+    setTitle(""); setBody(""); setType("info"); setPinned(false);
+    setSubmitting(false);
+  }
+
+  return (
+    <div className="flex flex-1 overflow-hidden">
+      {/* Compose */}
+      <div className="w-full md:w-80 flex-shrink-0 border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] p-4 space-y-4 overflow-y-auto">
+        <div>
+          <p className="text-[0.72rem] font-semibold uppercase tracking-wider text-[#71717A] mb-3">New Announcement</p>
+
+          <div className="space-y-3">
+            <div>
+              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Title</label>
+              <input
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                placeholder="Announcement title..."
+                className="input-dark w-full px-3 py-2.5 text-[0.82rem]"
+              />
+            </div>
+
+            <div>
+              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Message</label>
+              <textarea
+                value={body}
+                onChange={e => setBody(e.target.value)}
+                placeholder="Write your announcement here..."
+                rows={4}
+                className="input-dark w-full resize-y px-3 py-2.5 text-[0.82rem] font-[inherit]"
+              />
+            </div>
+
+            <div>
+              <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-2 block">Type</label>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(["info", "event", "urgent"] as AnnouncementType[]).map(t => {
+                  const Icon = TYPE_ICONS[t];
+                  return (
+                    <button
+                      key={t}
+                      onClick={() => setType(t)}
+                      className={cn(
+                        "flex flex-col items-center gap-1 py-2 rounded-xl border text-[0.65rem] font-medium transition-all",
+                        type === t
+                          ? TYPE_COLORS[t].badge + " border-current"
+                          : "border-white/5 text-[#52525B] hover:text-white hover:border-white/10"
+                      )}
+                    >
+                      <Icon size={13} />
+                      {TYPE_LABELS[t]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <label className="flex items-center gap-2 cursor-pointer">
+              <div
+                onClick={() => setPinned(p => !p)}
+                className={cn(
+                  "h-4 w-4 rounded flex items-center justify-center transition-all border",
+                  pinned ? "bg-amber-500 border-amber-400" : "border-white/15 bg-white/5"
+                )}
+              >
+                {pinned && <Pin size={9} className="text-white" />}
+              </div>
+              <span className="text-[0.75rem] text-[#A1A1AA]">Pin to top</span>
+            </label>
+
+            <button
+              onClick={handlePost}
+              disabled={submitting || !title.trim() || !body.trim()}
+              className="btn-purple w-full flex items-center justify-center gap-2 py-2.5 text-[0.82rem] font-medium disabled:opacity-40"
+            >
+              <Send size={13} />
+              Post Announcement
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-[#52525B] mb-2">
+          {announcements.length} announcement{announcements.length !== 1 ? "s" : ""}
+        </p>
+        {announcements.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3">
+            <Megaphone size={28} className="text-[#3F3F46]" />
+            <p className="text-[0.78rem] text-[#52525B]">No announcements posted yet.</p>
+          </div>
+        ) : (
+          announcements.map(ann => {
+            const cfg = TYPE_COLORS[ann.type];
+            const Icon = TYPE_ICONS[ann.type];
+            return (
+              <motion.div
+                key={ann.id}
+                layout
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl border border-white/6 bg-[#0C0C0C] p-4 flex gap-3"
+              >
+                <div className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1.5", cfg.dot)} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {ann.pinned && <Pin size={10} className="text-amber-400 flex-shrink-0" />}
+                      <span className={cn("text-[0.6rem] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border", cfg.badge)}>
+                        <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => togglePin(ann.id)}
+                        title={ann.pinned ? "Unpin" : "Pin"}
+                        className={cn("h-7 w-7 rounded-lg flex items-center justify-center transition-colors", ann.pinned ? "text-amber-400 bg-amber-500/10" : "text-[#52525B] hover:text-amber-400 hover:bg-amber-500/10")}
+                      >
+                        <Pin size={11} />
+                      </button>
+                      <button
+                        onClick={() => { deleteAnnouncement(ann.id); toast.success("Deleted."); }}
+                        className="h-7 w-7 rounded-lg flex items-center justify-center text-[#52525B] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <Trash2 size={11} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-[0.83rem] font-semibold text-white mb-1">{ann.title}</p>
+                  <p className="text-[0.73rem] text-[#71717A] leading-relaxed line-clamp-2">{ann.body}</p>
+                  <p className="text-[0.6rem] text-[#3F3F46] mt-2">
+                    {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ── Main Admin ──────────────────────────────────────────────── */
 export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const [authed, setAuthed] = useState(() => sessionStorage.getItem(SESSION_KEY) === "1");
@@ -267,6 +437,7 @@ export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [activeTab, setActiveTab] = useState<"riders" | "announcements">("riders");
 
   const fetchRiders = useCallback(async () => {
     setLoading(true);
@@ -340,27 +511,24 @@ export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />;
 
-  /* On mobile: show list OR editor, not both */
-  const showEditorMobile = selectedId !== null;
-
-  const topbarActions = (
-    <button onClick={() => { setSelectedId("new"); setForm(EMPTY_FORM); }}
-      className="btn-purple flex items-center gap-1.5 px-3 py-2 text-[0.72rem] font-medium">
-      <CirclePlus size={13} /> <span className="hidden sm:inline">New Rider</span>
-    </button>
-  );
+  const showEditorMobile = selectedId !== null && activeTab === "riders";
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <Topbar
         title="Admin Panel"
-        subtitle={`${riders.length} riders total`}
-        onRefresh={fetchRiders}
+        subtitle={`${riders.length} riders · ${activeTab === "riders" ? "Rider CRUD" : "Announcements"}`}
+        onRefresh={activeTab === "riders" ? fetchRiders : undefined}
         loading={loading}
         onMenuOpen={onMenuOpen}
         actions={
           <div className="flex items-center gap-2">
-            {topbarActions}
+            {activeTab === "riders" && (
+              <button onClick={() => { setSelectedId("new"); setForm(EMPTY_FORM); }}
+                className="btn-purple flex items-center gap-1.5 px-3 py-2 text-[0.72rem] font-medium">
+                <CirclePlus size={13} /> <span className="hidden sm:inline">New Rider</span>
+              </button>
+            )}
             <button onClick={() => { sessionStorage.removeItem(SESSION_KEY); setAuthed(false); }}
               className="btn-ghost flex items-center gap-1.5 px-3 py-2 text-[0.72rem] text-[#71717A] hover:text-red-400 transition-colors">
               <LogOut size={13} /> <span className="hidden sm:inline">Logout</span>
@@ -369,79 +537,105 @@ export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
         }
       />
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left — Rider List (hidden on mobile when editor is open) */}
-        <div className={cn(
-          "flex flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]",
-          "w-full md:w-72 md:flex-shrink-0",
-          showEditorMobile ? "hidden md:flex" : "flex"
-        )}>
-          <div className="border-b border-[rgba(39,39,42,0.6)] p-3">
-            <div className="relative">
-              <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]" />
-              <input type="search" placeholder="Search name..." value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="input-dark w-full pl-9 pr-3 py-2.5 text-[0.78rem]" />
+      {/* Tab bar */}
+      <div className="flex items-center gap-1 px-4 pt-3 pb-0 border-b border-[rgba(39,39,42,0.6)]">
+        {([
+          { id: "riders", label: "Riders", icon: Users },
+          { id: "announcements", label: "Announcements", icon: Megaphone },
+        ] as const).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => { setActiveTab(tab.id); if (tab.id === "riders") setSelectedId(null); }}
+            className={cn(
+              "flex items-center gap-1.5 px-4 py-2.5 text-[0.75rem] font-medium rounded-t-lg transition-all border-b-2 -mb-px",
+              activeTab === tab.id
+                ? "text-purple-300 border-purple-500 bg-purple-500/5"
+                : "text-[#71717A] border-transparent hover:text-white hover:bg-white/3"
+            )}
+          >
+            <tab.icon size={13} />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === "announcements" ? (
+        <AnnouncementsPanel />
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          {/* Left — Rider List */}
+          <div className={cn(
+            "flex flex-col border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D]",
+            "w-full md:w-72 md:flex-shrink-0",
+            showEditorMobile ? "hidden md:flex" : "flex"
+          )}>
+            <div className="border-b border-[rgba(39,39,42,0.6)] p-3">
+              <div className="relative">
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#71717A]" />
+                <input type="search" placeholder="Search name..." value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="input-dark w-full pl-9 pr-3 py-2.5 text-[0.78rem]" />
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {loading ? (
+                <div className="flex h-24 items-center justify-center">
+                  <RotateCcw size={16} className="animate-spin text-[#8B5CF6]" />
+                </div>
+              ) : filteredRiders.length === 0 ? (
+                <p className="py-8 text-center text-[0.75rem] text-[#52525B]">No riders found</p>
+              ) : (
+                filteredRiders.map((rider) => (
+                  <button key={rider.id} onClick={() => selectRider(rider)}
+                    className={cn(
+                      "w-full border-b border-[rgba(39,39,42,0.4)] px-4 py-3 text-left transition-all active:scale-[0.99]",
+                      "hover:bg-[rgba(255,255,255,0.03)]",
+                      selectedId === rider.id && "bg-[rgba(139,92,246,0.08)] border-l-2 border-l-[#8B5CF6]"
+                    )}>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <span className="text-[0.62rem] font-medium text-[#52525B]">#{rider.no}</span>
+                          <span className="truncate text-[0.8rem] font-medium text-[#A1A1AA]">{rider.nama}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={rankBadgeClass(rider.jabatan)}>{rider.jabatan}</span>
+                          {rider.alamat && <span className="text-[0.62rem] text-[#52525B] truncate">{rider.alamat}</span>}
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0 text-right">
+                        <span className="text-[0.78rem] font-semibold text-[#8B5CF6]">{numFmt(rider.total_km || 0)}</span>
+                        <p className="text-[0.6rem] text-[#52525B]">km</p>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
           </div>
-          <div className="flex-1 overflow-y-auto">
-            {loading ? (
-              <div className="flex h-24 items-center justify-center">
-                <RotateCcw size={16} className="animate-spin text-[#8B5CF6]" />
-              </div>
-            ) : filteredRiders.length === 0 ? (
-              <p className="py-8 text-center text-[0.75rem] text-[#52525B]">No riders found</p>
-            ) : (
-              filteredRiders.map((rider) => (
-                <button key={rider.id} onClick={() => selectRider(rider)}
-                  className={cn(
-                    "w-full border-b border-[rgba(39,39,42,0.4)] px-4 py-3 text-left transition-all active:scale-[0.99]",
-                    "hover:bg-[rgba(255,255,255,0.03)]",
-                    selectedId === rider.id && "bg-[rgba(139,92,246,0.08)] border-l-2 border-l-[#8B5CF6]"
-                  )}>
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <span className="text-[0.62rem] font-medium text-[#52525B]">#{rider.no}</span>
-                        <span className="truncate text-[0.8rem] font-medium text-[#A1A1AA]">{rider.nama}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className={rankBadgeClass(rider.jabatan)}>{rider.jabatan}</span>
-                        {rider.alamat && <span className="text-[0.62rem] text-[#52525B] truncate">{rider.alamat}</span>}
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0 text-right">
-                      <span className="text-[0.78rem] font-semibold text-[#8B5CF6]">{numFmt(rider.total_km || 0)}</span>
-                      <p className="text-[0.6rem] text-[#52525B]">km</p>
-                    </div>
-                  </div>
-                </button>
-              ))
-            )}
+
+          {/* Right — Editor */}
+          <div className={cn(
+            "flex-1 bg-[#0A0A0A] overflow-hidden",
+            showEditorMobile ? "flex flex-col" : "hidden md:flex md:flex-col"
+          )}>
+            <AnimatePresence mode="wait">
+              <EditorPanel
+                key={selectedId ?? "empty"}
+                selectedId={selectedId}
+                form={form}
+                setForm={setForm}
+                saving={saving}
+                deleting={deleting}
+                onSave={handleSave}
+                onDelete={handleDelete}
+                onCancel={cancelEdit}
+                onConfirmDelete={handleDelete}
+              />
+            </AnimatePresence>
           </div>
         </div>
-
-        {/* Right — Editor (full width on mobile when open) */}
-        <div className={cn(
-          "flex-1 bg-[#0A0A0A] overflow-hidden",
-          showEditorMobile ? "flex flex-col" : "hidden md:flex md:flex-col"
-        )}>
-          <AnimatePresence mode="wait">
-            <EditorPanel
-              key={selectedId ?? "empty"}
-              selectedId={selectedId}
-              form={form}
-              setForm={setForm}
-              saving={saving}
-              deleting={deleting}
-              onSave={handleSave}
-              onDelete={handleDelete}
-              onCancel={cancelEdit}
-              onConfirmDelete={handleDelete}
-            />
-          </AnimatePresence>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
