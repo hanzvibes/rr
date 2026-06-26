@@ -546,7 +546,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
     result.sort((a, b) => {
       let av: string | number = "", bv: string | number = "";
       if (sortKey === "runs") { av = parseRuns(a.aktivitas).length; bv = parseRuns(b.aktivitas).length; }
-      else { av = (a as Record<string, unknown>)[sortKey] as string | number ?? ""; bv = (b as Record<string, unknown>)[sortKey] as string | number ?? ""; }
+      else { av = (a as unknown as Record<string, unknown>)[sortKey] as string | number ?? ""; bv = (b as unknown as Record<string, unknown>)[sortKey] as string | number ?? ""; }
       if (av < bv) return sortDir === "asc" ? -1 : 1;
       if (av > bv) return sortDir === "asc" ? 1 : -1;
       return 0;
