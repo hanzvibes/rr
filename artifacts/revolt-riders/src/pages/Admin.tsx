@@ -2,14 +2,14 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Eye, EyeOff, LogOut, CirclePlus, RotateCcw, CheckCircle2, Trash2, X,
-  Search, ChevronLeft, Megaphone, Users, Pin, AlertTriangle, Info, PartyPopper, Send
+  Search, ChevronLeft, Megaphone, Users, Pin, AlertTriangle, Info, PartyPopper, Send, Pencil
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { numFmt, calcTotalKm, cn } from "@/lib/utils";
 import type { Rider } from "@/lib/types";
 import { Topbar } from "@/components/layout/Topbar";
-import { useAnnouncements, type AnnouncementType } from "@/lib/announcements";
+import { useAnnouncements, type AnnouncementType, type Announcement } from "@/lib/announcements";
 
 const JABATAN_LIST = ["FOUNDER", "PRESIDENT", "EXCECUTOR", "NEGOSIATOR", "LIFE MEMBER", "VIRGIN", "CAPROS", "PROSPEK"];
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD ?? "revolt2026";
@@ -268,33 +268,91 @@ const TYPE_COLORS = {
 };
 
 function AnnouncementsPanel() {
-  const { announcements, addAnnouncement, deleteAnnouncement, togglePin } = useAnnouncements();
+  const { announcements, addAnnouncement, updateAnnouncement, deleteAnnouncement, togglePin } = useAnnouncements();
+
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [type, setType] = useState<AnnouncementType>("info");
   const [pinned, setPinned] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-  function handlePost() {
+  const isEditing = editingId !== null;
+
+  function resetForm() {
+    setEditingId(null);
+    setTitle(""); setBody(""); setType("info"); setPinned(false);
+  }
+
+  function startEdit(ann: Announcement) {
+    setEditingId(ann.id);
+    setTitle(ann.title);
+    setBody(ann.body);
+    setType(ann.type);
+    setPinned(ann.pinned);
+  }
+
+  function handleSubmit() {
     if (!title.trim() || !body.trim()) {
       toast.error("Title and body are required.");
       return;
     }
     setSubmitting(true);
-    addAnnouncement({ title: title.trim(), body: body.trim(), type, pinned });
-    toast.success("Announcement posted!");
-    setTitle(""); setBody(""); setType("info"); setPinned(false);
+    if (isEditing) {
+      updateAnnouncement(editingId!, { title: title.trim(), body: body.trim(), type, pinned });
+      toast.success("Announcement updated!");
+    } else {
+      addAnnouncement({ title: title.trim(), body: body.trim(), type, pinned });
+      toast.success("Announcement posted!");
+    }
+    resetForm();
     setSubmitting(false);
+  }
+
+  function handleDelete(id: string) {
+    deleteAnnouncement(id);
+    toast.success("Deleted.");
+    setDeleteConfirmId(null);
+    if (editingId === id) resetForm();
   }
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      {/* Compose */}
-      <div className="w-full md:w-80 flex-shrink-0 border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] p-4 space-y-4 overflow-y-auto">
-        <div>
-          <p className="text-[0.72rem] font-semibold uppercase tracking-wider text-[#71717A] mb-3">New Announcement</p>
+      {/* Left — Compose / Edit panel */}
+      <div className="w-full md:w-80 flex-shrink-0 border-r border-[rgba(39,39,42,0.6)] bg-[#0D0D0D] flex flex-col overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={editingId ?? "new"}
+            initial={{ opacity: 0, x: -8 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -8 }}
+            transition={{ duration: 0.15 }}
+            className="flex-1 overflow-y-auto p-4 space-y-3"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <p className="text-[0.72rem] font-semibold uppercase tracking-wider text-[#71717A]">
+                {isEditing ? "Edit Announcement" : "New Announcement"}
+              </p>
+              {isEditing && (
+                <button
+                  onClick={resetForm}
+                  className="h-6 w-6 rounded-lg flex items-center justify-center text-[#52525B] hover:text-white transition-colors"
+                >
+                  <X size={13} />
+                </button>
+              )}
+            </div>
 
-          <div className="space-y-3">
+            {isEditing && (
+              <div className="rounded-lg px-3 py-2 text-[0.68rem] text-purple-300 flex items-center gap-2"
+                style={{ background: "rgba(139,92,246,0.1)", border: "1px solid rgba(139,92,246,0.2)" }}>
+                <Pencil size={10} />
+                Editing existing announcement
+              </div>
+            )}
+
             <div>
               <label className="text-[0.68rem] uppercase tracking-wider text-[#52525B] mb-1 block">Title</label>
               <input
@@ -353,23 +411,33 @@ function AnnouncementsPanel() {
               <span className="text-[0.75rem] text-[#A1A1AA]">Pin to top</span>
             </label>
 
-            <button
-              onClick={handlePost}
-              disabled={submitting || !title.trim() || !body.trim()}
-              className="btn-purple w-full flex items-center justify-center gap-2 py-2.5 text-[0.82rem] font-medium disabled:opacity-40"
-            >
-              <Send size={13} />
-              Post Announcement
-            </button>
-          </div>
-        </div>
+            <div className="flex gap-2 pt-1">
+              <button
+                onClick={handleSubmit}
+                disabled={submitting || !title.trim() || !body.trim()}
+                className="btn-purple flex-1 flex items-center justify-center gap-2 py-2.5 text-[0.82rem] font-medium disabled:opacity-40"
+              >
+                {isEditing ? <><CheckCircle2 size={13} /> Save Changes</> : <><Send size={13} /> Post</>}
+              </button>
+              {isEditing && (
+                <button
+                  onClick={resetForm}
+                  className="btn-ghost px-4 py-2.5 text-[0.82rem] text-[#71717A]"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
-      {/* List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-[#52525B] mb-2">
+      {/* Right — List */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2.5">
+        <p className="text-[0.68rem] font-semibold uppercase tracking-wider text-[#52525B] mb-3">
           {announcements.length} announcement{announcements.length !== 1 ? "s" : ""}
         </p>
+
         {announcements.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 gap-3">
             <Megaphone size={28} className="text-[#3F3F46]" />
@@ -379,45 +447,110 @@ function AnnouncementsPanel() {
           announcements.map(ann => {
             const cfg = TYPE_COLORS[ann.type];
             const Icon = TYPE_ICONS[ann.type];
+            const isActiveEdit = editingId === ann.id;
+            const isConfirmingDelete = deleteConfirmId === ann.id;
+
             return (
               <motion.div
                 key={ann.id}
                 layout
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-xl border border-white/6 bg-[#0C0C0C] p-4 flex gap-3"
+                className={cn(
+                  "rounded-xl border bg-[#0C0C0C] overflow-hidden transition-all",
+                  isActiveEdit
+                    ? "border-purple-500/40 ring-1 ring-purple-500/20"
+                    : "border-white/6"
+                )}
               >
-                <div className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1.5", cfg.dot)} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {ann.pinned && <Pin size={10} className="text-amber-400 flex-shrink-0" />}
-                      <span className={cn("text-[0.6rem] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border", cfg.badge)}>
-                        <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
-                      </span>
+                <div className="p-4 flex gap-3">
+                  <div className={cn("h-2 w-2 rounded-full flex-shrink-0 mt-1.5", cfg.dot)} />
+                  <div className="flex-1 min-w-0">
+                    {/* Top row */}
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {ann.pinned && <Pin size={9} className="text-amber-400 flex-shrink-0" />}
+                        <span className={cn("text-[0.58rem] font-semibold uppercase tracking-wider px-1.5 py-0.5 rounded-full border", cfg.badge)}>
+                          <Icon size={8} className="inline mr-1" />{TYPE_LABELS[ann.type]}
+                        </span>
+                      </div>
+                      {/* Action buttons */}
+                      <div className="flex items-center gap-0.5 flex-shrink-0">
+                        <button
+                          onClick={() => isActiveEdit ? resetForm() : startEdit(ann)}
+                          title={isActiveEdit ? "Cancel edit" : "Edit"}
+                          className={cn(
+                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
+                            isActiveEdit
+                              ? "text-purple-400 bg-purple-500/15"
+                              : "text-[#52525B] hover:text-purple-400 hover:bg-purple-500/10"
+                          )}
+                        >
+                          {isActiveEdit ? <X size={11} /> : <Pencil size={11} />}
+                        </button>
+                        <button
+                          onClick={() => togglePin(ann.id)}
+                          title={ann.pinned ? "Unpin" : "Pin"}
+                          className={cn(
+                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
+                            ann.pinned ? "text-amber-400 bg-amber-500/10" : "text-[#52525B] hover:text-amber-400 hover:bg-amber-500/10"
+                          )}
+                        >
+                          <Pin size={11} />
+                        </button>
+                        <button
+                          onClick={() => setDeleteConfirmId(isConfirmingDelete ? null : ann.id)}
+                          title="Delete"
+                          className={cn(
+                            "h-7 w-7 rounded-lg flex items-center justify-center transition-colors",
+                            isConfirmingDelete
+                              ? "text-red-400 bg-red-500/15"
+                              : "text-[#52525B] hover:text-red-400 hover:bg-red-500/10"
+                          )}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => togglePin(ann.id)}
-                        title={ann.pinned ? "Unpin" : "Pin"}
-                        className={cn("h-7 w-7 rounded-lg flex items-center justify-center transition-colors", ann.pinned ? "text-amber-400 bg-amber-500/10" : "text-[#52525B] hover:text-amber-400 hover:bg-amber-500/10")}
-                      >
-                        <Pin size={11} />
-                      </button>
-                      <button
-                        onClick={() => { deleteAnnouncement(ann.id); toast.success("Deleted."); }}
-                        className="h-7 w-7 rounded-lg flex items-center justify-center text-[#52525B] hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                      >
-                        <Trash2 size={11} />
-                      </button>
-                    </div>
+
+                    <p className="text-[0.83rem] font-semibold text-white mb-0.5">{ann.title}</p>
+                    <p className="text-[0.72rem] text-[#71717A] leading-relaxed line-clamp-2">{ann.body}</p>
+                    <p className="text-[0.58rem] text-[#3F3F46] mt-2">
+                      {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </p>
                   </div>
-                  <p className="text-[0.83rem] font-semibold text-white mb-1">{ann.title}</p>
-                  <p className="text-[0.73rem] text-[#71717A] leading-relaxed line-clamp-2">{ann.body}</p>
-                  <p className="text-[0.6rem] text-[#3F3F46] mt-2">
-                    {new Date(ann.date).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-                  </p>
                 </div>
+
+                {/* Delete confirm inline */}
+                <AnimatePresence>
+                  {isConfirmingDelete && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.15 }}
+                      className="overflow-hidden border-t border-red-500/20"
+                    >
+                      <div className="flex items-center justify-between px-4 py-2.5 bg-red-500/5">
+                        <p className="text-[0.72rem] text-red-400">Delete this announcement?</p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleDelete(ann.id)}
+                            className="rounded-lg bg-red-600 px-3 py-1.5 text-[0.7rem] font-medium text-white hover:bg-red-500 transition-colors"
+                          >
+                            Delete
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="btn-ghost rounded-lg px-3 py-1.5 text-[0.7rem] text-[#71717A]"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             );
           })

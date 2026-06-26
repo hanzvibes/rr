@@ -58,6 +58,13 @@ export function useAnnouncements() {
     setAnnouncements(updated);
   }, []);
 
+  const updateAnnouncement = useCallback((id: string, patch: Partial<Omit<Announcement, "id" | "date">>) => {
+    const current = loadAnnouncements();
+    const updated = current.map(a => a.id === id ? { ...a, ...patch } : a);
+    saveAnnouncements(updated);
+    setAnnouncements(updated);
+  }, []);
+
   const togglePin = useCallback((id: string) => {
     const current = loadAnnouncements();
     const updated = current.map(a => a.id === id ? { ...a, pinned: !a.pinned } : a);
@@ -70,5 +77,5 @@ export function useAnnouncements() {
     return new Date(b.date).getTime() - new Date(a.date).getTime();
   });
 
-  return { announcements: sortedAnnouncements, addAnnouncement, deleteAnnouncement, togglePin };
+  return { announcements: sortedAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement, togglePin };
 }

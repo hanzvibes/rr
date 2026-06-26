@@ -486,10 +486,8 @@ function AnnouncementBanner() {
         <span className="text-[0.78rem] font-semibold text-white">{latest.title}</span>
         <span className="text-[0.73rem] text-[#71717A] ml-2 line-clamp-1">{latest.body}</span>
       </div>
-      <Link href="/announcements">
-        <a className={`flex items-center gap-1 text-[0.68rem] font-medium flex-shrink-0 transition-opacity hover:opacity-70 ${cfg.color}`}>
-          View all <ArrowRight size={11} />
-        </a>
+      <Link href="/announcements" className={`flex items-center gap-1 text-[0.68rem] font-medium flex-shrink-0 transition-opacity hover:opacity-70 ${cfg.color}`}>
+        View all <ArrowRight size={11} />
       </Link>
     </motion.div>
   );
