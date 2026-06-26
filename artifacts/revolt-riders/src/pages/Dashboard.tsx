@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Users, Gauge, TrendingUp, Crown, Bike, Star,
-  Search, Download, ChevronUp, ChevronDown, X,
-  ChevronRight, ArrowUpRight, Filter, LayoutGrid, List,
+  Users2, Navigation2, Activity, Flame, Timer, Gem,
+  Search, ArrowDownToLine, ChevronUp, ChevronDown, X,
+  ChevronRight, SlidersHorizontal, LayoutGrid, Rows3,
 } from "lucide-react";
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -590,7 +590,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
     <>
       <button onClick={handleExport} disabled={loading || !riders.length}
         className="btn-purple flex items-center gap-2 px-3 py-2 text-[0.72rem] font-medium disabled:opacity-40">
-        <Download size={13} />
+        <ArrowDownToLine size={13} />
         <span className="hidden sm:inline">Export</span>
       </button>
     </>
@@ -623,12 +623,12 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
             Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
           ) : stats ? (
             <>
-              <StatCard label="Total Riders" value={riders.length} icon={Users} sparkline={[18,20,22,23,24,25,26,27]} delay={0} />
-              <StatCard label="Total KM" value={stats.totalKm} suffix=" km" icon={Gauge} accent sparkline={sparklineKm} delay={0.05} />
-              <StatCard label="Avg KM" value={stats.avgKm} suffix=" km" icon={TrendingUp} sub="per rider" delay={0.1} />
-              <StatCard label="Road Captain" value={stats.topRider?.total_km ?? 0} suffix=" km" icon={Crown} accent sub={stats.topRider?.nama?.split(" ")[0]} delay={0.15} />
-              <StatCard label="Total Runs" value={stats.runs} icon={Bike} delay={0.2} />
-              <StatCard label="Founders" value={stats.founders} icon={Star} sub="founding members" delay={0.25} />
+              <StatCard label="Total Riders" value={riders.length} icon={Users2} sparkline={[18,20,22,23,24,25,26,27]} delay={0} />
+              <StatCard label="Total KM" value={stats.totalKm} suffix=" km" icon={Navigation2} accent sparkline={sparklineKm} delay={0.05} />
+              <StatCard label="Avg KM" value={stats.avgKm} suffix=" km" icon={Activity} sub="per rider" delay={0.1} />
+              <StatCard label="Road Captain" value={stats.topRider?.total_km ?? 0} suffix=" km" icon={Flame} accent sub={stats.topRider?.nama?.split(" ")[0]} delay={0.15} />
+              <StatCard label="Total Runs" value={stats.runs} icon={Timer} delay={0.2} />
+              <StatCard label="Founders" value={stats.founders} icon={Gem} sub="founding members" delay={0.25} />
             </>
           ) : null}
         </div>
@@ -710,7 +710,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
               <button onClick={() => setFilterOpen(true)}
                 className={cn("btn-ghost flex items-center gap-1.5 px-3 py-2.5 text-[0.75rem] relative flex-shrink-0",
                   activeFilterCount > 0 && "border-[#8B5CF6]/40 text-[#8B5CF6]")}>
-                <Filter size={14} />
+                <SlidersHorizontal size={14} />
                 <span className="hidden sm:inline">Filter</span>
                 {activeFilterCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#8B5CF6] text-[0.55rem] text-white">
@@ -741,7 +741,7 @@ export default function Dashboard({ onMenuOpen }: { onMenuOpen?: () => void }) {
                 <button onClick={() => setViewMode("table")}
                   className={cn("flex h-9 w-9 items-center justify-center transition-colors",
                     viewMode === "table" ? "bg-[#8B5CF6]/20 text-[#8B5CF6]" : "text-[#71717A] hover:text-white")}>
-                  <List size={14} />
+                  <Rows3 size={14} />
                 </button>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Swords, Crown, Bike, TrendingUp, Trophy, Calendar, MapPin, Star, RefreshCw, ChevronDown } from "lucide-react";
+import { Swords, Flame, Route, Activity, Medal, CalendarDays, MapPin, Sparkles, RotateCcw, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { numFmt, parseRuns, cn } from "@/lib/utils";
@@ -45,12 +45,12 @@ interface StatLine {
 
 function buildStats(a: EnrichedRider, b: EnrichedRider): StatLine[] {
   return [
-    { label: "Total KM", icon: <TrendingUp size={13} />, aVal: a.total_km, bVal: b.total_km, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
-    { label: "Total Runs", icon: <Bike size={13} />, aVal: a.runs, bVal: b.runs, fmt: (n) => `${n} runs`, higherWins: true },
-    { label: "Avg KM / Run", icon: <Star size={13} />, aVal: a.avgKm, bVal: b.avgKm, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
-    { label: "Best Single Run", icon: <Trophy size={13} />, aVal: a.topRun, bVal: b.topRun, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
-    { label: "Seniority", icon: <Calendar size={13} />, aVal: a.seniorityYears, bVal: b.seniorityYears, fmt: (n) => `${n} yr${n !== 1 ? "s" : ""}`, higherWins: true },
-    { label: "Rank Weight", icon: <Crown size={13} />, aVal: rankWeight(a.jabatan), bVal: rankWeight(b.jabatan), fmt: () => "", higherWins: true },
+    { label: "Total KM", icon: <Activity size={13} />, aVal: a.total_km, bVal: b.total_km, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
+    { label: "Total Runs", icon: <Route size={13} />, aVal: a.runs, bVal: b.runs, fmt: (n) => `${n} runs`, higherWins: true },
+    { label: "Avg KM / Run", icon: <Sparkles size={13} />, aVal: a.avgKm, bVal: b.avgKm, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
+    { label: "Best Single Run", icon: <Medal size={13} />, aVal: a.topRun, bVal: b.topRun, fmt: (n) => `${numFmt(n)} km`, higherWins: true },
+    { label: "Seniority", icon: <CalendarDays size={13} />, aVal: a.seniorityYears, bVal: b.seniorityYears, fmt: (n) => `${n} yr${n !== 1 ? "s" : ""}`, higherWins: true },
+    { label: "Rank Weight", icon: <Flame size={13} />, aVal: rankWeight(a.jabatan), bVal: rankWeight(b.jabatan), fmt: () => "", higherWins: true },
   ];
 }
 
@@ -366,7 +366,7 @@ export default function Showdown({ onMenuOpen }: { onMenuOpen?: () => void }) {
             disabled={loading}
             className="btn-ghost flex items-center gap-1.5 px-3 py-2 text-[0.72rem] font-medium disabled:opacity-40"
           >
-            <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+            <RotateCcw size={13} className={loading ? "animate-spin" : ""} />
             <span className="hidden sm:inline">Refresh</span>
           </button>
         }
@@ -536,7 +536,7 @@ function MutualRuns({ a, b }: { a: EnrichedRider; b: EnrichedRider }) {
               transition={{ delay: 0.55 + i * 0.04 }}
               className="flex items-center gap-3 px-4 py-2.5"
             >
-              <Bike size={11} className="text-[#52525B] flex-shrink-0" />
+              <Route size={11} className="text-[#52525B] flex-shrink-0" />
               <span className="flex-1 text-[0.75rem] text-white truncate">{run.nama}</span>
               <span className="text-[0.68rem] text-purple-400 font-semibold">{numFmt(aKm)} km</span>
               <span className="text-[0.58rem] text-[#3F3F46]">vs</span>

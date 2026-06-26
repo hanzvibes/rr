@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Eye, EyeOff, LogOut, Plus, RefreshCw, Save, Trash2, X, Search, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, LogOut, CirclePlus, RotateCcw, CheckCircle2, Trash2, X, Search, ChevronLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { numFmt, calcTotalKm, cn } from "@/lib/utils";
@@ -125,7 +125,7 @@ function EditorPanel({
       <div className="flex h-full items-center justify-center p-8">
         <div className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.03)] text-[#52525B]">
-            <Plus size={28} />
+            <CirclePlus size={28} />
           </div>
           <p className="text-[0.85rem] font-medium text-[#52525B]">Select a rider to edit</p>
           <p className="mt-1 text-[0.72rem] text-[#3F3F46]">or tap + New Rider</p>
@@ -143,7 +143,7 @@ function EditorPanel({
           {/* Back button — visible always on mobile for UX clarity */}
           <button onClick={onCancel}
             className="flex h-9 w-9 items-center justify-center rounded-xl border border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.03)] text-[#71717A] hover:text-white transition-colors md:hidden">
-            <ArrowLeft size={16} />
+            <ChevronLeft size={16} />
           </button>
           <div className="flex-1">
             <h2 className="text-[0.92rem] font-semibold text-white">
@@ -210,7 +210,7 @@ function EditorPanel({
           <div className="flex items-center gap-3 pt-1 pb-6">
             <button onClick={onSave} disabled={saving}
               className="btn-purple flex flex-1 items-center justify-center gap-2 py-3 text-[0.82rem] font-medium disabled:opacity-50">
-              <Save size={15} />
+              <CheckCircle2 size={15} />
               {saving ? "Saving..." : "Save"}
             </button>
             {selectedId !== "new" && (
@@ -346,7 +346,7 @@ export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
   const topbarActions = (
     <button onClick={() => { setSelectedId("new"); setForm(EMPTY_FORM); }}
       className="btn-purple flex items-center gap-1.5 px-3 py-2 text-[0.72rem] font-medium">
-      <Plus size={13} /> <span className="hidden sm:inline">New Rider</span>
+      <CirclePlus size={13} /> <span className="hidden sm:inline">New Rider</span>
     </button>
   );
 
@@ -387,7 +387,7 @@ export default function Admin({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="flex h-24 items-center justify-center">
-                <RefreshCw size={16} className="animate-spin text-[#8B5CF6]" />
+                <RotateCcw size={16} className="animate-spin text-[#8B5CF6]" />
               </div>
             ) : filteredRiders.length === 0 ? (
               <p className="py-8 text-center text-[0.75rem] text-[#52525B]">No riders found</p>

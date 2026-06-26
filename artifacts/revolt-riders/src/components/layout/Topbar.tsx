@@ -1,4 +1,4 @@
-import { RefreshCw, Menu } from "lucide-react";
+import { RotateCcw, AlignLeft } from "lucide-react";
 
 interface TopbarProps {
   title: string;
@@ -19,7 +19,7 @@ export function Topbar({ title, subtitle, onRefresh, loading, actions, onMenuOpe
             onClick={onMenuOpen}
             className="md:hidden btn-ghost flex h-8 w-8 items-center justify-center p-0 flex-shrink-0"
           >
-            <Menu size={16} />
+            <AlignLeft size={16} />
           </button>
         )}
         <div className="min-w-0">
@@ -43,7 +43,7 @@ export function Topbar({ title, subtitle, onRefresh, loading, actions, onMenuOpe
             disabled={loading}
             className="btn-ghost flex h-8 w-8 items-center justify-center p-0 disabled:opacity-30"
           >
-            <RefreshCw
+            <RotateCcw
               size={13}
               className={loading ? "animate-spin text-[#8B5CF6]" : "text-[#71717A]"}
             />

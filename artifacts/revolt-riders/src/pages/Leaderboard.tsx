@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Trophy, Crown, Star, TrendingUp, TrendingDown,
-  Minus, Bike, ChevronRight, RefreshCw,
+  Award, Flame, Sparkles, TrendingUp, TrendingDown,
+  Minus, Route, ChevronRight, RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -77,17 +77,17 @@ function DeltaBadge({ delta }: { delta: number | null }) {
 function PositionIcon({ rank }: { rank: number }) {
   if (rank === 1) return (
     <div className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400/30 to-yellow-500/20 border border-amber-500/30">
-      <Crown size={20} className="text-amber-400" />
+      <Flame size={20} className="text-amber-400" />
     </div>
   );
   if (rank === 2) return (
     <div className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-400/20 to-slate-500/10 border border-slate-500/30">
-      <Trophy size={18} className="text-slate-400" />
+      <Award size={18} className="text-slate-400" />
     </div>
   );
   if (rank === 3) return (
     <div className="flex h-10 w-10 md:h-12 md:w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-700/20 to-orange-800/10 border border-amber-700/30">
-      <Star size={18} className="text-amber-600" />
+      <Sparkles size={18} className="text-amber-600" />
     </div>
   );
   return (
@@ -251,7 +251,7 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
       disabled={loading}
       className="btn-ghost flex items-center gap-1.5 px-3 py-2 text-[0.72rem] font-medium disabled:opacity-40"
     >
-      <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
+      <RotateCcw size={13} className={loading ? "animate-spin" : ""} />
       <span className="hidden sm:inline">Refresh</span>
     </button>
   );
@@ -275,7 +275,7 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
           className="glass-card mb-5 px-4 py-6 md:px-8 md:py-8"
         >
           <div className="mb-6 flex items-center gap-2">
-            <Trophy size={18} className="text-amber-400" />
+            <Award size={18} className="text-amber-400" />
             <h2 className="text-[0.9rem] font-semibold text-white">Top Riders</h2>
             <span className="badge-gray ml-auto">{riders.length} riders total</span>
           </div>
@@ -420,7 +420,7 @@ function RiderRow({ rider, index, maxKm, isTop3 = false }: {
         isTop3 ? topColor : "text-[#52525B] border-[rgba(39,39,42,0.6)] bg-[rgba(255,255,255,0.02)]"
       )}>
         {isTop3 ? (
-          rider.rank === 1 ? <Crown size={16} /> : rider.rank === 2 ? <Trophy size={15} /> : <Star size={15} />
+          rider.rank === 1 ? <Flame size={16} /> : rider.rank === 2 ? <Award size={15} /> : <Sparkles size={15} />
         ) : rider.rank}
       </div>
 
@@ -432,7 +432,7 @@ function RiderRow({ rider, index, maxKm, isTop3 = false }: {
         </div>
         <div className="flex items-center gap-3 text-[0.66rem] text-[#71717A] mb-1.5">
           {rider.alamat && <span className="truncate max-w-[100px]">{rider.alamat}</span>}
-          <span className="flex items-center gap-0.5"><Bike size={9} /> {rider.runs} runs</span>
+          <span className="flex items-center gap-0.5"><Route size={9} /> {rider.runs} runs</span>
           {rider.avgKm > 0 && <span>avg {numFmt(rider.avgKm)} km/run</span>}
         </div>
         <KmBar value={rider.total_km} max={maxKm} rank={rider.rank} />

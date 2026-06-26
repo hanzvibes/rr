@@ -8,7 +8,7 @@ import {
   TIER_STYLES,
   type Badge, type BadgeTier, type Rider,
 } from "@/lib/achievements";
-import { ChevronDown, ChevronUp, Award, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Trophy, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 type BadgeTierFilter = "all" | BadgeTier;
@@ -261,7 +261,7 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#8B5CF6]/50 to-transparent" />
           <div className="relative flex items-center gap-4">
             <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#A855F7] shadow-lg shadow-purple-900/40">
-              <Award size={24} className="text-white" />
+              <Trophy size={24} className="text-white" />
             </div>
             <div>
               <div className="flex items-center gap-2 mb-0.5">

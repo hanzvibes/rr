@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Bike, Users, TrendingUp, Search, ChevronDown,
-  ChevronRight, SortAsc, MapPin, Star,
+  Route, Users2, Activity, Search, ChevronDown,
+  ChevronRight, ArrowUpDown, MapPin, Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -114,7 +114,7 @@ function RunCard({
                 ? "bg-gradient-to-br from-amber-500/20 to-yellow-600/10 border border-amber-500/30 text-amber-400"
                 : "bg-gradient-to-br from-[#7C3AED]/20 to-[#A855F7]/10 border border-[#8B5CF6]/20 text-[#8B5CF6]"
             )}>
-              {index === 0 ? <Star size={18} /> : <Bike size={16} />}
+              {index === 0 ? <Sparkles size={18} /> : <Route size={16} />}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -132,12 +132,12 @@ function RunCard({
 
               <div className="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-[0.7rem] text-[#71717A]">
                 <span className="flex items-center gap-1">
-                  <Users size={11} />
+                  <Users2 size={11} />
                   <strong className="text-[#A1A1AA]">{run.riderCount}</strong> riders
                   <span className="text-[#52525B]">({pct}%)</span>
                 </span>
                 <span className="flex items-center gap-1">
-                  <TrendingUp size={11} />
+                  <Activity size={11} />
                   <strong className="text-[#A1A1AA]">{numFmt(run.totalKm)}</strong> km total
                 </span>
                 <span className="flex items-center gap-1">
@@ -361,7 +361,7 @@ export default function RunHistory({ onMenuOpen }: { onMenuOpen?: () => void }) 
             />
           </div>
           <div className="flex items-center gap-2 flex-shrink-0 flex-wrap">
-            <SortAsc size={13} className="text-[#71717A] flex-shrink-0" />
+            <ArrowUpDown size={13} className="text-[#71717A] flex-shrink-0" />
             <div className="flex rounded-xl border border-[rgba(39,39,42,0.8)] overflow-hidden">
               {SORT_OPTIONS.map(({ key, label }) => (
                 <button
