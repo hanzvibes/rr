@@ -8,7 +8,7 @@ import {
   TIER_STYLES,
   type Badge, type BadgeTier, type Rider,
 } from "@/lib/achievements";
-import { ChevronDown, ChevronUp, Trophy, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Trophy, Sparkles, Medal, Users2, Star } from "lucide-react";
 import { toast } from "sonner";
 
 type BadgeTierFilter = "all" | BadgeTier;
@@ -50,6 +50,7 @@ function TrophyCard({ badge, index }: { badge: BadgeWithEarners; index: number }
   const s = TIER_STYLES[badge.tier];
   const earned = badge.earners.length;
   const isLegendary = badge.tier === "legendary";
+  const BadgeIcon = badge.icon;
 
   return (
     <motion.div
@@ -62,22 +63,19 @@ function TrophyCard({ badge, index }: { badge: BadgeWithEarners; index: number }
       )}
       onClick={() => setOpen((o) => !o)}
     >
-      {/* Legendary top shimmer */}
       {isLegendary && (
         <div className="h-px bg-gradient-to-r from-transparent via-amber-400/60 to-transparent" />
       )}
 
       <div className="p-4 md:p-5">
         <div className="flex items-start gap-4">
-          {/* Icon */}
           <div className={cn(
-            "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border text-2xl shadow-lg",
+            "flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl border shadow-lg",
             `bg-gradient-to-br ${s.bg}`, s.border, s.glow
           )}>
-            {badge.icon}
+            <BadgeIcon size={24} className={s.text} />
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2 mb-1.5">
               <div>
@@ -124,7 +122,6 @@ function TrophyCard({ badge, index }: { badge: BadgeWithEarners; index: number }
         )}
       </div>
 
-      {/* Earner list */}
       <AnimatePresence>
         {open && earned > 0 && (
           <motion.div
@@ -168,10 +165,17 @@ function TrophyCard({ badge, index }: { badge: BadgeWithEarners; index: number }
 }
 
 /* ── Summary stat ─────────────────────────────────────────────── */
-function StatTile({ icon, label, value, sub }: { icon: string; label: string; value: string | number; sub?: string }) {
+function StatTile({ Icon, label, value, sub }: {
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  value: string | number;
+  sub?: string;
+}) {
   return (
     <div className="glass-card p-4 flex items-center gap-3">
-      <div className="text-2xl flex-shrink-0">{icon}</div>
+      <div className="flex-shrink-0">
+        <Icon size={20} className="text-[#71717A]" />
+      </div>
       <div className="min-w-0">
         <p className="text-[0.6rem] font-medium uppercase tracking-widest text-[#71717A]">{label}</p>
         <p className="text-[0.95rem] font-bold text-white mt-0.5 truncate">{value}</p>
@@ -204,7 +208,6 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
   useEffect(() => { fetchRiders(); }, [fetchRiders]);
 
-  /* Compute badge → earners mapping */
   const badgesWithEarners: BadgeWithEarners[] = ALL_BADGES.map((badge) => ({
     ...badge,
     earners: riders.filter((r) => computeBadges(r).some((b) => b.id === badge.id)).map((r) => ({
@@ -214,7 +217,6 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
     })),
   }));
 
-  /* Summary stats */
   const totalAwarded = badgesWithEarners.reduce((s, b) => s + b.earners.length, 0);
   const ridersWithAny = riders.filter((r) => computeBadges(r).length > 0).length;
   const mostDecorated = riders.reduce<Rider | null>((top, r) => {
@@ -227,11 +229,11 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
 
   const FILTERS: { key: BadgeTierFilter; label: string }[] = [
     { key: "all", label: "All" },
-    { key: "legendary", label: "🏆 Legendary" },
-    { key: "gold", label: "🥇 Gold" },
-    { key: "silver", label: "⚡ Silver" },
-    { key: "bronze", label: "🔥 Bronze" },
-    { key: "special", label: "💎 Special" },
+    { key: "legendary", label: "Legendary" },
+    { key: "gold", label: "Gold" },
+    { key: "silver", label: "Silver" },
+    { key: "bronze", label: "Bronze" },
+    { key: "special", label: "Special" },
   ];
 
   const displayed = filter === "all"
@@ -283,18 +285,18 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
           transition={{ duration: 0.18, delay: 0.08 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"
         >
-          <StatTile icon="🏅" label="Total Awarded" value={totalAwarded} sub="badge instances" />
-          <StatTile icon="🏍️" label="Decorated Riders" value={`${ridersWithAny} / ${riders.length}`} sub="have at least one badge" />
+          <StatTile Icon={Medal} label="Total Awarded" value={totalAwarded} sub="badge instances" />
+          <StatTile Icon={Users2} label="Decorated Riders" value={`${ridersWithAny} / ${riders.length}`} sub="have at least one badge" />
           <StatTile
-            icon="🌟"
+            Icon={Star}
             label="Most Decorated"
             value={mostDecorated ? mostDecorated.nama.split(" ")[0] : "—"}
             sub={mostDecorated ? `${computeBadges(mostDecorated).length} badges` : ""}
           />
           <StatTile
-            icon="💫"
+            Icon={Sparkles}
             label="Rarest Badge"
-            value={rarestBadge ? rarestBadge.icon + " " + rarestBadge.name : "—"}
+            value={rarestBadge ? rarestBadge.name : "—"}
             sub={rarestBadge ? `${rarestBadge.earners.length} earner${rarestBadge.earners.length !== 1 ? "s" : ""}` : ""}
           />
         </motion.div>
@@ -351,7 +353,7 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
           </div>
         )}
 
-        {/* Per-rider leaderboard: who has the most badges */}
+        {/* Hall of Fame */}
         {!loading && riders.length > 0 && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -380,7 +382,6 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
                     transition={{ duration: 0.12, delay: Math.min(i * 0.03, 0.3) }}
                     className="flex items-center gap-3 px-4 md:px-5 py-3 border-b border-[rgba(39,39,42,0.4)] last:border-0 hover:bg-[rgba(255,255,255,0.02)] transition-colors"
                   >
-                    {/* Rank */}
                     <div className={cn(
                       "flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border text-[0.72rem] font-bold",
                       i === 0 ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
@@ -391,31 +392,31 @@ export default function Trophies({ onMenuOpen }: { onMenuOpen?: () => void }) {
                       {i + 1}
                     </div>
 
-                    {/* Name + jabatan */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-[0.82rem] font-semibold text-white truncate">{rider.nama}</span>
                         <span className={cn(jabatanBadgeClass(rider.jabatan))}>{rider.jabatan}</span>
                       </div>
-                      {/* Badge icons */}
                       <div className="flex items-center gap-1 flex-wrap">
-                        {badges.map((b) => (
-                          <span
-                            key={b.id}
-                            title={b.name}
-                            className={cn(
-                              "text-[0.7rem] px-1.5 py-0.5 rounded-lg border",
-                              TIER_STYLES[b.tier].border,
-                              `bg-gradient-to-r ${TIER_STYLES[b.tier].bg}`
-                            )}
-                          >
-                            {b.icon}
-                          </span>
-                        ))}
+                        {badges.map((b) => {
+                          const BIcon = b.icon;
+                          return (
+                            <span
+                              key={b.id}
+                              title={b.name}
+                              className={cn(
+                                "inline-flex items-center justify-center p-1 rounded-lg border",
+                                TIER_STYLES[b.tier].border,
+                                `bg-gradient-to-r ${TIER_STYLES[b.tier].bg}`
+                              )}
+                            >
+                              <BIcon size={11} className={TIER_STYLES[b.tier].text} />
+                            </span>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Badge count */}
                     <div className="flex-shrink-0 text-right">
                       <p className="text-[1rem] font-black text-white">{badges.length}</p>
                       <p className="text-[0.58rem] text-[#52525B]">badge{badges.length !== 1 ? "s" : ""}</p>

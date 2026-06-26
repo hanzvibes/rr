@@ -1,3 +1,9 @@
+import {
+  Trophy, Rocket, Zap, Flame, Globe, Target, Crown, Swords, Gem, Medal, Gauge,
+  Map as MapIcon,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
 export type BadgeTier = "legendary" | "gold" | "silver" | "bronze" | "special";
 export type BadgeRarity = "legendary" | "rare" | "uncommon" | "common";
 
@@ -5,7 +11,7 @@ export interface Badge {
   id: string;
   name: string;
   description: string;
-  icon: string;
+  icon: LucideIcon;
   tier: BadgeTier;
   rarity: BadgeRarity;
 }
@@ -47,7 +53,7 @@ export const ALL_BADGES: Badge[] = [
     id: "legend",
     name: "LEGEND",
     description: "Total distance exceeds 2,000 km",
-    icon: "🏆",
+    icon: Trophy,
     tier: "legendary",
     rarity: "legendary",
   },
@@ -55,7 +61,7 @@ export const ALL_BADGES: Badge[] = [
     id: "road_warrior",
     name: "ROAD WARRIOR",
     description: "Total distance exceeds 1,500 km",
-    icon: "🚀",
+    icon: Rocket,
     tier: "gold",
     rarity: "rare",
   },
@@ -63,7 +69,7 @@ export const ALL_BADGES: Badge[] = [
     id: "velocity",
     name: "VELOCITY",
     description: "Total distance exceeds 1,000 km",
-    icon: "⚡",
+    icon: Zap,
     tier: "silver",
     rarity: "uncommon",
   },
@@ -71,7 +77,7 @@ export const ALL_BADGES: Badge[] = [
     id: "iron",
     name: "IRON RIDER",
     description: "Total distance exceeds 500 km",
-    icon: "🔥",
+    icon: Flame,
     tier: "bronze",
     rarity: "common",
   },
@@ -79,7 +85,7 @@ export const ALL_BADGES: Badge[] = [
     id: "explorer",
     name: "EXPLORER",
     description: "Participated in 20+ unique club runs",
-    icon: "🌍",
+    icon: Globe,
     tier: "gold",
     rarity: "rare",
   },
@@ -87,7 +93,7 @@ export const ALL_BADGES: Badge[] = [
     id: "adventurer",
     name: "ADVENTURER",
     description: "Participated in 10+ unique club runs",
-    icon: "🗺️",
+    icon: MapIcon,
     tier: "silver",
     rarity: "uncommon",
   },
@@ -95,7 +101,7 @@ export const ALL_BADGES: Badge[] = [
     id: "scout",
     name: "SCOUT",
     description: "Participated in 5+ unique club runs",
-    icon: "🎯",
+    icon: Target,
     tier: "bronze",
     rarity: "common",
   },
@@ -103,7 +109,7 @@ export const ALL_BADGES: Badge[] = [
     id: "royalty",
     name: "ROYALTY",
     description: "Club Founder — a pillar of the brotherhood",
-    icon: "👑",
+    icon: Crown,
     tier: "special",
     rarity: "rare",
   },
@@ -111,7 +117,7 @@ export const ALL_BADGES: Badge[] = [
     id: "commander",
     name: "COMMANDER",
     description: "Holds an executive position in the club",
-    icon: "⚔️",
+    icon: Swords,
     tier: "special",
     rarity: "uncommon",
   },
@@ -119,7 +125,7 @@ export const ALL_BADGES: Badge[] = [
     id: "life_member",
     name: "LIFE MEMBER",
     description: "Bonded to the club for life",
-    icon: "💎",
+    icon: Gem,
     tier: "special",
     rarity: "rare",
   },
@@ -127,7 +133,7 @@ export const ALL_BADGES: Badge[] = [
     id: "veteran",
     name: "VETERAN",
     description: "Joined the club before 2022",
-    icon: "🎖️",
+    icon: Medal,
     tier: "gold",
     rarity: "uncommon",
   },
@@ -135,7 +141,7 @@ export const ALL_BADGES: Badge[] = [
     id: "centurion",
     name: "CENTURION",
     description: "Averages 100+ km per run",
-    icon: "🏍️",
+    icon: Gauge,
     tier: "silver",
     rarity: "uncommon",
   },

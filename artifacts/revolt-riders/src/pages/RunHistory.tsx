@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Route, Users2, Activity, Search, ChevronDown,
-  ChevronRight, ArrowUpDown, MapPin, Sparkles,
+  ChevronRight, ArrowUpDown, MapPin, Sparkles, Flag, Bike,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -325,14 +325,14 @@ export default function RunHistory({ onMenuOpen }: { onMenuOpen?: () => void }) 
             transition={{ duration: 0.18 }}
             className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"
           >
-            {[
-              { label: "Unique Runs", value: stats.uniqueRuns, suffix: "", icon: "🛣️" },
-              { label: "Total KM Logged", value: stats.totalKm, suffix: " km", icon: "📍" },
-              { label: "Most Riders", value: stats.mostRiders?.riderCount ?? 0, suffix: "", sub: stats.mostRiders?.name, icon: "👥" },
-              { label: "Longest Avg", value: stats.longestRun?.avgKm ?? 0, suffix: " km", sub: stats.longestRun?.name, icon: "🏁" },
-            ].map(({ label, value, suffix, sub, icon }) => (
+            {([
+              { label: "Unique Runs", value: stats.uniqueRuns, suffix: "", Icon: Route },
+              { label: "Total KM Logged", value: stats.totalKm, suffix: " km", Icon: MapPin },
+              { label: "Most Riders", value: stats.mostRiders?.riderCount ?? 0, suffix: "", sub: stats.mostRiders?.name, Icon: Users2 },
+              { label: "Longest Avg", value: stats.longestRun?.avgKm ?? 0, suffix: " km", sub: stats.longestRun?.name, Icon: Flag },
+            ] as { label: string; value: number; suffix: string; sub?: string; Icon: React.ComponentType<{ size?: number; className?: string }> }[]).map(({ label, value, suffix, sub, Icon }) => (
               <div key={label} className="glass-card px-4 py-3.5">
-                <div className="text-lg mb-1">{icon}</div>
+                <Icon size={16} className="text-[#71717A] mb-1" />
                 <p className="text-[0.62rem] font-medium uppercase tracking-wider text-[#71717A]">{label}</p>
                 <p className="text-[1.05rem] font-bold text-white mt-0.5">
                   <Num v={value} />{suffix}
@@ -408,7 +408,7 @@ export default function RunHistory({ onMenuOpen }: { onMenuOpen?: () => void }) 
         ) : sorted.length === 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="glass-card py-14 text-center">
-            <div className="text-4xl mb-3">🏍️</div>
+            <div className="flex justify-center mb-3"><Bike size={40} className="text-[#3F3F46]" /></div>
             <p className="text-[0.85rem] text-[#71717A]">No runs found{search ? ` for "${search}"` : ""}</p>
           </motion.div>
         ) : viewMode === "timeline" ? (

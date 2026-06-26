@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Award, Flame, Sparkles, TrendingUp, TrendingDown,
-  Minus, Route, ChevronRight, RotateCcw,
+  Minus, Route, ChevronRight, RotateCcw, Users, Trophy,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
@@ -127,7 +127,8 @@ function PodiumBlock({ rider, position }: { rider: RankedRider; position: 1 | 2 
     3: { border: "border-amber-700/40", bg: "from-amber-700/10 to-transparent", text: "text-amber-600", glow: "shadow-amber-900/20" },
   };
   const c = colors[position];
-  const labels = { 1: "🥇", 2: "🥈", 3: "🥉" };
+  const labelIcons = { 1: Flame, 2: Award, 3: Sparkles };
+  const LabelIcon = labelIcons[position];
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -164,7 +165,7 @@ function PodiumBlock({ rider, position }: { rider: RankedRider; position: 1 | 2 
           `bg-gradient-to-b ${c.bg}`
         )}
       >
-        <span className="text-xl">{labels[position]}</span>
+        <LabelIcon size={20} className={c.text} />
       </motion.div>
     </div>
   );
@@ -369,13 +370,13 @@ export default function Leaderboard({ onMenuOpen }: { onMenuOpen?: () => void })
             transition={{ delay: 0.2 }}
             className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3"
           >
-            {[
-              { label: "Total Riders", value: riders.length, icon: "👥" },
-              { label: "Total KM Logged", value: `${numFmt(riders.reduce((s, r) => s + (r.total_km || 0), 0))} km`, icon: "🛣️" },
-              { label: "Top KM", value: `${numFmt(riders[0]?.total_km || 0)} km`, icon: "🏆" },
-            ].map(({ label, value, icon }) => (
+            {([
+              { label: "Total Riders", value: riders.length, Icon: Users },
+              { label: "Total KM Logged", value: `${numFmt(riders.reduce((s, r) => s + (r.total_km || 0), 0))} km`, Icon: Route },
+              { label: "Top KM", value: `${numFmt(riders[0]?.total_km || 0)} km`, Icon: Trophy },
+            ] as { label: string; value: string | number; Icon: React.ComponentType<{ size?: number; className?: string }> }[]).map(({ label, value, Icon }) => (
               <div key={label} className="glass-card px-4 py-3 text-center">
-                <div className="text-xl mb-1">{icon}</div>
+                <Icon size={18} className="text-[#71717A] mx-auto mb-1" />
                 <p className="text-[0.72rem] text-[#71717A]">{label}</p>
                 <p className="text-[0.92rem] font-bold text-white mt-0.5">{typeof value === "number" ? value.toLocaleString("id-ID") : value}</p>
               </div>

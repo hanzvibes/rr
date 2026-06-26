@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Swords, Flame, Route, Activity, Medal, CalendarDays, MapPin, Sparkles, RotateCcw, ChevronDown } from "lucide-react";
+import { Swords, Flame, Route, Activity, Medal, CalendarDays, MapPin, Sparkles, RotateCcw, ChevronDown, Trophy, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { numFmt, parseRuns, cn } from "@/lib/utils";
@@ -408,7 +408,7 @@ export default function Showdown({ onMenuOpen }: { onMenuOpen?: () => void }) {
                 : "bg-[rgba(255,255,255,0.04)] text-[#52525B] cursor-not-allowed"
             )}
           >
-            {ready ? "⚔️  START BATTLE" : "Select two riders to begin"}
+            {ready ? <span className="flex items-center justify-center gap-2"><Swords size={15} /> START BATTLE</span> : "Select two riders to begin"}
           </button>
         </motion.div>
 
@@ -433,9 +433,9 @@ export default function Showdown({ onMenuOpen }: { onMenuOpen?: () => void }) {
                 <span className={cn("text-[1.3rem] font-black tabular-nums", aWins > bWins ? "text-purple-400" : "text-[#52525B]")}>{aWins}</span>
                 <div className="flex flex-col items-center gap-0.5">
                   <p className="text-[0.58rem] uppercase tracking-widest text-[#52525B]">Battle Result</p>
-                  {aWins > bWins && <p className="text-[0.65rem] font-bold text-amber-400">🏆 {enrichedA.nama.split(" ")[0]} wins!</p>}
-                  {bWins > aWins && <p className="text-[0.65rem] font-bold text-amber-400">🏆 {enrichedB.nama.split(" ")[0]} wins!</p>}
-                  {aWins === bWins && <p className="text-[0.65rem] font-bold text-[#71717A]">⚡ It's a draw!</p>}
+                  {aWins > bWins && <p className="text-[0.65rem] font-bold text-amber-400 flex items-center gap-1"><Trophy size={11} /> {enrichedA.nama.split(" ")[0]} wins!</p>}
+                  {bWins > aWins && <p className="text-[0.65rem] font-bold text-amber-400 flex items-center gap-1"><Trophy size={11} /> {enrichedB.nama.split(" ")[0]} wins!</p>}
+                  {aWins === bWins && <p className="text-[0.65rem] font-bold text-[#71717A] flex items-center gap-1"><Zap size={11} /> It's a draw!</p>}
                   {ties > 0 && <p className="text-[0.55rem] text-[#3F3F46]">{ties} tied categor{ties > 1 ? "ies" : "y"}</p>}
                 </div>
                 <span className={cn("text-[1.3rem] font-black tabular-nums", bWins > aWins ? "text-orange-400" : "text-[#52525B]")}>{bWins}</span>
