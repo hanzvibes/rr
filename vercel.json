@@ -1,6 +1,6 @@
 {
-  "buildCommand": "pnpm --filter @workspace/revolt-riders run build",
-  "outputDirectory": "artifacts/revolt-riders/dist",
+  "buildCommand": "pnpm run build:vercel",
+  "outputDirectory": "dist-deploy",
   "installCommand": "pnpm install",
   "framework": null,
   "rewrites": [
